@@ -1,0 +1,36 @@
+{
+    "name": "meh/meh",
+    "description": "Toy PHP Implementation",
+    "keywords": ["php"],
+    "homepage": "https://github.com/cretz/meh",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        { "name": "Chad Retz" }
+    ],
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "php/php-src",
+                "version": "5.4.21",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/php/php-src",
+                    "reference": "php-5.4.21"
+                }
+            }
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "nikic/php-parser": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*",
+        "php/php-src": "5.4.21"
+    },
+    "autoload": {
+        "psr-0": { "Meh": "src/" }
+    }
+}
