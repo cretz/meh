@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class FunctionName
+class FunctionName extends Node
 {
     /** @var Name[] */
     public $names;

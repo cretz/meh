@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class DoStatement implements Statement
+class DoStatement extends Node implements Statement
 {
     /** @var Block */
     public $block;

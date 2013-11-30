@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class VariableExpressioon implements Variable
+class VariableExpression extends Node implements Variable
 {
     /** @var PrefixExpression */
     public $prefixExpression;

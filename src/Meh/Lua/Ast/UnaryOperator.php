@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class UnaryOperator
+class UnaryOperator extends Node
 {
     /** @var string */
     public $operator;

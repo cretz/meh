@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class String implements Expression, ArgumentList
+class String extends Node implements Expression, ArgumentList
 {
     /** @var string */
     public $value;

@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class NameList
+class NameList extends Node
 {
     /** @var Name[] */
     public $names;

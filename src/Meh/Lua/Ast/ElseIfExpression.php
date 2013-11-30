@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class ElseIfExpression
+class ElseIfExpression extends Node
 {
     /** @var Expression */
     public $expression;

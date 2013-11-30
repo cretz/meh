@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class BracketedField implements Field
+class BracketedField extends Node implements Field
 {
     /** @var Expression */
     public $left;

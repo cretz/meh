@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class IfStatement implements Statement
+class IfStatement extends Node implements Statement
 {
     /** @var Expression */
     public $expression;

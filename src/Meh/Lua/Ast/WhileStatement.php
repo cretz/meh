@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class WhileStatement implements Statement
+class WhileStatement extends Node implements Statement
 {
     /** @var Expression */
     public $expression;

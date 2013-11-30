@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class NamedField implements Field
+class NamedField extends Node implements Field
 {
     /** @var Expression */
     public $expression;

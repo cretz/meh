@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class ReturnStatement implements LastStatement
+class ReturnStatement extends Node
 {
     /** @var ExpressionList|null */
     public $expressions;

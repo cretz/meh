@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class ExpressionList
+class ExpressionList extends Node
 {
     /** @var Expression[] */
     public $expressions;

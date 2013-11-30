@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class ParenthesizedExpressionList implements ArgumentList
+class ParenthesizedExpressionList extends Node implements ArgumentList
 {
     /** @var ExpressionList|null */
     public $expressions;

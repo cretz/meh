@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class Name implements Variable
+class Name extends Node implements Variable
 {
     /** @var string */
     public $name;

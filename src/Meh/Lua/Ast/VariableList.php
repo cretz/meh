@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class VariableList
+class VariableList extends Node
 {
     /** @var Variable[] */
     public $variables;

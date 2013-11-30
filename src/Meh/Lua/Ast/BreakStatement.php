@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class BreakStatement implements LastStatement
+class BreakStatement extends Node implements Statement
 {
 
 }

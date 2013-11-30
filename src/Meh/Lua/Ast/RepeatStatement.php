@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class RepeatStatement implements Statement
+class RepeatStatement extends Node implements Statement
 {
     /** @var Block */
     public $block;

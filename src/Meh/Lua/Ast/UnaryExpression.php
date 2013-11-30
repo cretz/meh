@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class UnaryExpression implements Expression
+class UnaryExpression extends Node implements Expression
 {
     /** @var UnaryOperator */
     public $operator;

@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class ParenthesizedExpression implements PrefixExpression
+class ParenthesizedExpression extends Node implements PrefixExpression
 {
     /** @var Expression */
     public $expression;

@@ -29,6 +29,7 @@ class PhpSrcTest extends MehTestCase
         // Load and parse phpt file
         $test = (new PhptParser())->parse(file_get_contents($file));
         // Compile it
+
         // Run it
         // Compare output
         $this->assertEquals(1, 1);

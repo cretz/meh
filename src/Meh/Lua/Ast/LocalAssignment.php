@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class LocalAssignment implements Statement
+class LocalAssignment extends Node implements Statement
 {
     /** @var NameList */
     public $names;

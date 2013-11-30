@@ -1,9 +1,9 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class ParameterList
+class ParameterList extends Node
 {
-    /** @var NameList */
+    /** @var NameList|null */
     public $names;
 
     /** @var VariableArguments|null */
@@ -13,7 +13,7 @@ class ParameterList
      * @param NameList $names
      * @param VariableArguments $variableArguments
      */
-    public function __construct(NameList $names, VariableArguments $variableArguments = null)
+    public function __construct(NameList $names = null, VariableArguments $variableArguments = null)
     {
         $this->names = $names;
         $this->variableArguments = $variableArguments;

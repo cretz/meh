@@ -6,7 +6,7 @@ use Meh\Lua\Ast\FunctionDeclaration;
 use Meh\Lua\Ast\Variable;
 use Meh\MehException;
 
-class Context implements StatementContainer
+class Context
 {
     /** @var Builder */
     public $bld;
@@ -17,15 +17,6 @@ class Context implements StatementContainer
     public function __construct()
     {
         $this->bld = new Builder();
-    }
-
-    public function append($stmts)
-    {
-        // Must have child context that is container
-        if (empty($this->childContexts) || !($this->childContexts[0] instanceof StatementContainer)) {
-            throw new MehException('No child contexts');
-        }
-        $this->childContexts[0]->append($stmts);
     }
 
     /** @return FunctionContext|null */

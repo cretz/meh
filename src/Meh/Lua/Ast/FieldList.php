@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class FieldList
+class FieldList extends Node
 {
     /** @var Field[] */
     public $fields;

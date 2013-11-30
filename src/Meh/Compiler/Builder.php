@@ -5,21 +5,30 @@ use Meh\Lua\Ast\ArgumentList;
 use Meh\Lua\Ast\Assignment;
 use Meh\Lua\Ast\BinaryExpression;
 use Meh\Lua\Ast\BinaryOperator;
+use Meh\Lua\Ast\Block;
 use Meh\Lua\Ast\Chunk;
+use Meh\Lua\Ast\ElseIfExpression;
 use Meh\Lua\Ast\Expression;
 use Meh\Lua\Ast\ExpressionList;
+use Meh\Lua\Ast\FunctionBody;
 use Meh\Lua\Ast\FunctionCall;
+use Meh\Lua\Ast\FunctionDeclaration;
+use Meh\Lua\Ast\FunctionName;
 use Meh\Lua\Ast\IfStatement;
 use Meh\Lua\Ast\KeywordLiteral;
 use Meh\Lua\Ast\LastStatement;
 use Meh\Lua\Ast\Name;
+use Meh\Lua\Ast\NameList;
 use Meh\Lua\Ast\Number;
+use Meh\Lua\Ast\ParameterList;
 use Meh\Lua\Ast\ParenthesizedExpressionList;
 use Meh\Lua\Ast\PrefixExpression;
+use Meh\Lua\Ast\ReturnStatement;
 use Meh\Lua\Ast\Statement;
 use Meh\Lua\Ast\String;
 use Meh\Lua\Ast\TableConstructor;
 use Meh\Lua\Ast\Variable;
+use Meh\Lua\Ast\VariableArguments;
 use Meh\Lua\Ast\VariableList;
 use Meh\Lua\Ast\VariableName;
 use Meh\MehException;
@@ -48,13 +57,13 @@ class Builder
 
     /**
      * @param (Statement|LastStatement)[] $stmts
-     * @return Chunk
+     * @return Block
      */
     public function block(array $stmts)
     {
-        $lastStatement = null;
-        if ($stmts[count($stmts) - 1] instanceof LastStatement) $lastStatement = array_pop($stmts);
-        return new Chunk($stmts, $lastStatement);
+        $returnStatement = null;
+        if ($stmts[count($stmts) - 1] instanceof ReturnStatement) $returnStatement = array_pop($stmts);
+        return new Block($stmts, $returnStatement);
     }
 
     /**
@@ -65,6 +74,26 @@ class Builder
     public function call(PrefixExpression $expr, $args)
     {
         return new FunctionCall($expr, $this->args($args));
+    }
+
+    /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return BinaryExpression
+     */
+    public function concat(Expression $left, Expression $right)
+    {
+        return new BinaryExpression($left, new BinaryOperator('..'), $right);
+    }
+
+    /**
+     * @param Expression $expr
+     * @param Block $block
+     * @return ElseIfExpression
+     */
+    public function elseIfExpr(Expression $expr, Block $block)
+    {
+        return new ElseIfExpression($expr, $block);
     }
 
     /**
@@ -89,13 +118,52 @@ class Builder
     }
 
     /**
+     * No statements, no var arg setting. Caller expected to set later
+     *
+     * @param string|string[] $name
+     * @param string[] $params
+     * @return FunctionDeclaration
+     */
+    public function funcDeclHead($name, array $params)
+    {
+        $funcName = null;
+        if (is_string($name)) $funcName = new FunctionName([$this->varName($name)]);
+        elseif (is_array($name)) {
+            $names = [];
+            foreach ($name as $piece) {
+                $names[] = $this->varName($piece);
+            }
+            $funcName = new FunctionName($names);
+        }
+        return new FunctionDeclaration(
+            $funcName,
+            new FunctionBody($this->params($params, false), new Block([]))
+        );
+    }
+
+    /**
      * @param Expression $expr
      * @param (Statement|LastStatement)[] $stmts
+     * @param ElseIfExpression[] $elseIfs
+     * @param Block|null $else
      * @return IfStatement
      */
-    public function ifStmt(Expression $expr, array $stmts)
+    public function ifStmt(Expression $expr, array $stmts, array $elseIfs = [], Block $else = null)
     {
-        return new IfStatement($expr, $this->block($stmts));
+        return new IfStatement($expr, $this->block($stmts), $elseIfs, $else);
+    }
+
+    /**
+     * @param string[] $names
+     * @return NameList
+     */
+    public function nameList(array $names)
+    {
+        $nameArr = array();
+        foreach ($names as $name) {
+            $nameArr[] = $this->varName($name);
+        }
+        return new NameList($nameArr);
     }
 
     /** @return KeywordLiteral */
@@ -111,6 +179,26 @@ class Builder
     public function number($val)
     {
         return new Number($val);
+    }
+
+    /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return BinaryExpression
+     */
+    public function orExpr(Expression $left, Expression $right)
+    {
+        return new BinaryExpression($left, new BinaryOperator('or'), $right);
+    }
+
+    /**
+     * @param string[] $params
+     * @param bool $varArg
+     * @return ParameterList
+     */
+    public function params(array $params, $varArg)
+    {
+        return new ParameterList($this->nameList($params), $varArg ? new VariableArguments() : null);
     }
 
     /**

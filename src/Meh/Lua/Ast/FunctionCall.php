@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class FunctionCall implements Statement, PrefixExpression
+class FunctionCall extends Node implements Statement, PrefixExpression
 {
     /** @var PrefixExpression */
     public $prefixExpression;

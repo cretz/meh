@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class KeywordLiteral implements Expression
+class KeywordLiteral extends Node implements Expression
 {
     /** @var bool|null */
     public $value;

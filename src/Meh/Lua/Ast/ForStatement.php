@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class ForStatement implements Statement
+class ForStatement extends Node implements Statement
 {
     /** @var Name */
     public $name;
@@ -9,11 +9,11 @@ class ForStatement implements Statement
     /** @var Expression */
     public $initializer;
 
+    /** @var Expression */
+    public $conditional;
+
     /** @var Block */
     public $block;
-
-    /** @var Expression|null */
-    public $conditional;
 
     /** @var Expression|null */
     public $increment;
@@ -21,21 +21,21 @@ class ForStatement implements Statement
     /**
      * @param Name $name
      * @param Expression $initializer
-     * @param Block $block
      * @param Expression $conditional
+     * @param Block $block
      * @param Expression $increment
      */
     function __construct(
         Name $name,
         Expression $initializer,
+        Expression $conditional,
         Block $block,
-        Expression $conditional = null,
         Expression $increment = null
     ) {
         $this->name = $name;
         $this->initializer = $initializer;
-        $this->block = $block;
         $this->conditional = $conditional;
+        $this->block = $block;
         $this->increment = $increment;
     }
 }

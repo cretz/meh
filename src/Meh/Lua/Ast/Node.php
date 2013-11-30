@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-interface LastStatement
+abstract class Node
 {
 
 }

@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class Assignment implements Statement
+class Assignment extends Node implements Statement
 {
     /** @var VariableList */
     public $variables;

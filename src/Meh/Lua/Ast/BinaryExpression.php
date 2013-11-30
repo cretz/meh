@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class BinaryExpression implements Expression
+class BinaryExpression extends Node implements Expression
 {
     /** @var Expression */
     public $left;

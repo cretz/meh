@@ -1,12 +1,12 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class FunctionBody
+class FunctionBody extends Node
 {
     /** @var ParameterList */
     public $parameters;
 
-    /** @var Block */
+    /** @var Chunk */
     public $block;
 
     /**

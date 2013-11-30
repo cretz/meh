@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class TableConstructor implements Expression, ArgumentList
+class TableConstructor extends Node implements Expression, ArgumentList
 {
     /** @var FieldList|null */
     public $fields;

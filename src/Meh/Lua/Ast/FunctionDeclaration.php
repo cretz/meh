@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class FunctionDeclaration implements Statement
+class FunctionDeclaration extends Node implements Statement
 {
     /** @var FunctionName */
     public $name;

@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class ForInStatement implements Statement
+class ForInStatement extends Node implements Statement
 {
     /** @var NameList */
     public $names;

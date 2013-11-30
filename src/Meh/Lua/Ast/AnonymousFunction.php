@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class AnonymousFunction implements Expression
+class AnonymousFunction extends Node implements Expression
 {
     /** @var FunctionBody */
     public $body;

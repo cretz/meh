@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class LocalFunctionDeclaration implements Statement
+class LocalFunctionDeclaration extends Node implements Statement
 {
     /** @var Name */
     public $name;

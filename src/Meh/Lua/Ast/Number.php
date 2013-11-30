@@ -1,7 +1,7 @@
 <?php
 namespace Meh\Lua\Ast;
 
-class Number implements Expression
+class Number extends Node implements Expression
 {
     /** @var int|double */
     public $value;
