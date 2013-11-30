@@ -9,9 +9,6 @@ trait ExprSmaller
 
     public function transpileExprSmaller(\PHPParser_Node_Expr_Smaller $node, Context $ctx)
     {
-        return $ctx->bld->call(
-            $ctx->bld->varName(['php', 'lt']),
-            [$this->transpile($node->left, $ctx), $this->transpile($node->right, $ctx)]
-        );
+        return $ctx->phpLt($this->transpile($node->left, $ctx), $this->transpile($node->right, $ctx));
     }
 }

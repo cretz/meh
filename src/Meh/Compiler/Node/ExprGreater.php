@@ -9,9 +9,6 @@ trait ExprGreater
 
     public function transpileExprGreater(\PHPParser_Node_Expr_Greater $node, Context $ctx)
     {
-        return $ctx->bld->call(
-            $ctx->bld->varName(['php', 'gt']),
-            [$this->transpile($node->left, $ctx), $this->transpile($node->right, $ctx)]
-        );
+        return $ctx->phpGt($this->transpile($node->left, $ctx), $this->transpile($node->right, $ctx));
     }
 }

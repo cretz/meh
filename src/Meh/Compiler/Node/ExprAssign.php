@@ -9,9 +9,6 @@ trait ExprAssign
 
     public function transpileExprAssign(\PHPParser_Node_Expr_Assign $node, Context $ctx)
     {
-        return $ctx->bld->call(
-            $ctx->bld->varName(['php', 'assign']),
-            [$this->transpile($node->var, $ctx), $this->transpile($node->expr, $ctx)]
-        );
+        return $ctx->phpAssign($this->transpile($node->var, $ctx), $this->transpile($node->expr, $ctx));
     }
 }

@@ -13,6 +13,6 @@ trait ExprFuncCall
         foreach ($node->args as $arg) {
             $args[] = $this->transpile($arg, $ctx);
         }
-        return $ctx->bld->call($this->transpile($node->name, $ctx), $args);
+        return $ctx->bld->call($ctx->bld->varName(['php', $this->transpile($node->name, $ctx)]), $args);
     }
 }

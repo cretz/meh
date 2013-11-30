@@ -18,7 +18,7 @@ trait StmtStatic
         $var = $ctx->bld->varName([
             'php',
             'globals',
-            '__staticVar__' . $ctx->peekFunc()->decl->name
+            '__staticVar__' . str_replace('.', '__', $ctx->peekFunc()->decl->name)
         ]);
         // Append if statement that lazily creates static var table
         $stmts[] = $ctx->bld->ifStmt(

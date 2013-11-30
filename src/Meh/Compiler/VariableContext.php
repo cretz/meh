@@ -3,6 +3,10 @@ namespace Meh\Compiler;
 
 class VariableContext
 {
-    /** @var bool[] Keyed by variable name */
-    public $neededLocals = [];
+    public $tmpVarCounter = 0;
+
+    public function newLocalTmpVarName()
+    {
+        return '_tmpVar' . $this->tmpVarCounter++;
+    }
 }

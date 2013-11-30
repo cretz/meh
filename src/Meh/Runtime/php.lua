@@ -1,4 +1,4 @@
-local io = require "io"
+local io = require("io")
 
 local php = {}
 
@@ -15,16 +15,22 @@ php.assign = function(val, newVal)
   val.val = newVal.val
   return val
 end
-php.concat = function(left, right)
-  local l, r
-  if left.val == nil then l = '' else l = left.val end
-  if right.val == nil then r = '' else r = right.val end
-  return php.stringVal(l .. r)
+php.concat = function(...)
+  local r = ''
+  for _, v in ipairs({...}) do
+    if v.val ~= nil then r = r .. v.val end
+  end
+  return php.stringVal(r)
 end
 php.echo = function(...)
   for _, v in ipairs({...}) do
     if v.val ~= nil then io.write(v.val) end
   end
+end
+php.eq = function(left, right)
+  if (left.type == "int" or left.type == "float") and
+          (right.type == "int" or right.type == "float") then return left.val == right.val end
+  error("Bad type, left: " .. left.type .. ", right: " .. right.type)
 end
 php.gt = function(left, right)
   if (left.type == "int" or left.type == "float") and
@@ -69,5 +75,9 @@ function php.VarCtx.__new(parent)
   else self.__parent = parent end
   return self
 end
+
+-- Extensions (hardcoded for now)
+local ext = require("ext-errorfunc")
+ext.apply(php)
 
 return php

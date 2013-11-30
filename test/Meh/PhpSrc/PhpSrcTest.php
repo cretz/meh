@@ -29,6 +29,7 @@ class PhpSrcTest extends MehTestCase
             if (substr_compare($realPath, '.phpt', -5) === 0) $files[] = [$realPath];
         }
         return $files;
+        // return [$files[count($files) - 1]];
     }
 
     /**

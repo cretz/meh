@@ -31,11 +31,8 @@ trait File
         foreach ($nodes as $node) {
             $stmts[] = $this->transpile($node, $ctx);
         }
-        // Pop var context and create locals as needed
-        $varCtx = $ctx->popVarCtx();
-        if (!empty($varCtx->neededLocals)) {
-            array_unshift($stmts, $ctx->bld->localAssign($ctx->bld->nameList(array_keys($varCtx->neededLocals))));
-        }
+        // Pop var context
+        $ctx->popVarCtx();
         return $ctx->bld->stmts($stmts);
     }
 }

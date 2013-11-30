@@ -39,6 +39,16 @@ use Meh\MehException;
 class Builder
 {
     /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return BinaryExpression
+     */
+    public function andExpr(Expression $left, Expression $right)
+    {
+        return new BinaryExpression($left, new BinaryOperator('and'), $right);
+    }
+
+    /**
      * @param ArgumentList|Expression[] $args
      * @return ArgumentList
      */
@@ -240,6 +250,11 @@ class Builder
     {
         return new TableConstructor();
     }
+    /** @return KeywordLiteral */
+    public function trueExpr()
+    {
+        return new KeywordLiteral(true);
+    }
 
     /**
      * @param Variable|Variable[]|VariableList $variables
@@ -262,8 +277,8 @@ class Builder
     {
         // Simple string is simple name
         if (is_string($pieces)) return new Name($pieces);
-        // If it's already a variable name, good
-        if ($pieces instanceof Variable) return $pieces;
+        // If it's already a prefix, good
+        if ($pieces instanceof PrefixExpression) return $pieces;
         // Must be an array
         if (!is_array($pieces)) throw new MehException('Unexpected type of variable name');
         // Go through each, adding the last to the one before

@@ -1,6 +1,7 @@
 <?php
 namespace Meh\Compiler;
 
+use Meh\Lua\Ast\Expression;
 use Meh\Lua\Ast\FunctionCall;
 use Meh\Lua\Ast\FunctionDeclaration;
 use Meh\Lua\Ast\Variable;
@@ -41,6 +42,13 @@ class Context
     }
 
     /** @return VariableContext|null */
+    public function peekGlobalVarCtx()
+    {
+        if (empty($this->childContexts)) return null;
+        return $this->childContexts[count($this->childContexts) - 1];
+    }
+
+    /** @return VariableContext|null */
     public function peekVarCtx()
     {
         foreach ($this->childContexts as $context) {
@@ -50,12 +58,44 @@ class Context
     }
 
     /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return FunctionCall
+     */
+    public function phpAssign(Expression $left, Expression $right)
+    {
+        return $this->bld->call($this->bld->varName(['php', 'assign']), [$left, $right]);
+    }
+
+    /**
      * @param bool $val
      * @return Variable
      */
     public function phpBool($val)
     {
         return $val ? $this->phpTrue() : $this->phpFalse();
+    }
+
+    /**
+     * @param Expression[] $pieces
+     * @return FunctionCall
+     */
+    public function phpConcat(array $pieces)
+    {
+        return $this->bld->call($this->bld->varName(['php', 'concat']), $pieces);
+    }
+
+    /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return FunctionCall
+     */
+    public function phpEq(Expression $left, Expression $right)
+    {
+        return $this->bld->call(
+            $this->bld->varName(['php', 'eq']),
+            [$left, $right]
+        );
     }
 
     /** @return Variable */
@@ -74,12 +114,38 @@ class Context
     }
 
     /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return FunctionCall
+     */
+    public function phpGt(Expression $left, Expression $right)
+    {
+        return $this->bld->call(
+            $this->bld->varName(['php', 'gt']),
+            [$left, $right]
+        );
+    }
+
+    /**
      * @param int $val
      * @return FunctionCall
      */
     public function phpInt($val)
     {
         return $this->bld->call($this->bld->varName(['php', 'intVal']), [$this->bld->number($val)]);
+    }
+
+    /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return FunctionCall
+     */
+    public function phpLt(Expression $left, Expression $right)
+    {
+        return $this->bld->call(
+            $this->bld->varName(['php', 'lt']),
+            [$left, $right]
+        );
     }
 
     /** @return Variable */

@@ -12,6 +12,9 @@ class FunctionContext extends VariableContext
     /** @var bool */
     public $needsVarArg = false;
 
+    /** @var bool */
+    public $needsGlobalCtx = false;
+
     /** @param FunctionDeclaration $decl */
     public function __construct(FunctionDeclaration $decl)
     {

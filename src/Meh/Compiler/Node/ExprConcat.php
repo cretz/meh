@@ -9,9 +9,6 @@ trait ExprConcat
 
     public function transpileExprConcat(\PHPParser_Node_Expr_Concat $node, Context $ctx)
     {
-        return $ctx->bld->call(
-            $ctx->bld->varName(['php', 'concat']),
-            [$this->transpile($node->left, $ctx), $this->transpile($node->right, $ctx)]
-        );
+        return $ctx->phpConcat([$this->transpile($node->left, $ctx), $this->transpile($node->right, $ctx)]);
     }
 }
