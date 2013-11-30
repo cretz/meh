@@ -11,4 +11,10 @@ class String extends Node implements Expression, ArgumentList
     {
         $this->value = $value;
     }
+
+    public function unescape()
+    {
+        // TODO: this needs to be smarter
+        return addcslashes($this->value, "\f\n\r\t\v\\");
+    }
 }

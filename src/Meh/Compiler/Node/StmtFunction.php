@@ -17,13 +17,20 @@ trait StmtFunction
         // Push decl w/ no statements
         $decl = $ctx->bld->funcDeclHead($node->name, $params);
         $ctx->pushFunc($decl);
-        // Tranpile statements
         $stmts = [];
+        // Put the local variable store at the top
+        $stmts[] = $ctx->bld->localAssign($ctx->bld->nameList(['locals']), $ctx->bld->table());
+        // Tranpile statements
         foreach ($node->stmts as $stmt) {
             $stmts[] = $this->transpile($stmt, $ctx);
         }
-        // Now add statements and var arg if necessary
-        if ($ctx->popFunc()->needsVarArg) $decl->body->parameters->variableArguments = new VariableArguments();
+        // Now add var arg if necessary
+        $funcCtx = $ctx->popFunc();
+        if ($funcCtx->needsVarArg) $decl->body->parameters->variableArguments = new VariableArguments();
+        // And all locals
+        if (!empty($funcCtx->neededLocals)) {
+            array_unshift($stmts, $ctx->bld->localAssign($ctx->bld->nameList(array_keys($funcCtx->neededLocals))));
+        }
         $decl->body->block = $ctx->bld->block($stmts);
         return $decl;
     }

@@ -32,6 +32,7 @@ use Meh\Lua\Ast\LocalFunctionDeclaration;
 use Meh\Lua\Ast\Name;
 use Meh\Lua\Ast\NamedField;
 use Meh\Lua\Ast\NameList;
+use Meh\Lua\Ast\Node;
 use Meh\Lua\Ast\Number;
 use Meh\Lua\Ast\ParameterList;
 use Meh\Lua\Ast\ParenthesizedExpression;
@@ -40,6 +41,7 @@ use Meh\Lua\Ast\PrefixExpression;
 use Meh\Lua\Ast\RepeatStatement;
 use Meh\Lua\Ast\ReturnStatement;
 use Meh\Lua\Ast\Statement;
+use Meh\Lua\Ast\StatementList;
 use Meh\Lua\Ast\String;
 use Meh\Lua\Ast\TableConstructor;
 use Meh\Lua\Ast\UnaryExpression;
@@ -71,6 +73,7 @@ class Printer
     {
         $ctx->newLine();
         $this->printVariableList($ast->variables, $ctx);
+        $ctx->append(' = ');
         $this->printExpressionList($ast->expressions, $ctx);
     }
 
@@ -209,7 +212,7 @@ class Printer
         $this->printParameterList($ast->parameters, $ctx);
         $ctx->append(') ');
         $this->printBlock($ast->block, $ctx);
-        $this->newLine('end');
+        $ctx->newLine('end');
     }
 
     public function printFunctionCall(FunctionCall $ast, Context $ctx, $newLine)
@@ -263,7 +266,7 @@ class Printer
             $ctx->newLine('else');
             $this->printBlock($ast->elseBlock, $ctx);
         }
-        $this->newLine('end');
+        $ctx->newLine('end');
     }
 
     public function printKeywordLiteral(KeywordLiteral $ast, Context $ctx)
@@ -391,13 +394,21 @@ class Printer
         elseif ($ast instanceof FunctionDeclaration) $this->printFunctionDeclaration($ast, $ctx);
         elseif ($ast instanceof LocalFunctionDeclaration) $this->printLocalFunctionDeclaration($ast, $ctx);
         elseif ($ast instanceof LocalAssignment) $this->printLocalAssignment($ast, $ctx);
+        elseif ($ast instanceof StatementList) $this->printStatementList($ast, $ctx);
         else throw new MehException('Unrecognized statement: ' . get_class($ast));
+    }
+
+    public function printStatementList(StatementList $ast, Context $ctx)
+    {
+        foreach ($ast->statements as $statement) {
+            $this->printStatement($statement, $ctx);
+        }
     }
 
     public function printString(String $ast, Context $ctx)
     {
         // TODO: properly stringify
-        $ctx->append("'" . $ast->value . "'");
+        $ctx->append("'" . $ast->unescape() . "'");
     }
 
     public function printTableConstructor(TableConstructor $ast, Context $ctx)

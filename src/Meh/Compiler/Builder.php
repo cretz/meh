@@ -17,6 +17,7 @@ use Meh\Lua\Ast\FunctionName;
 use Meh\Lua\Ast\IfStatement;
 use Meh\Lua\Ast\KeywordLiteral;
 use Meh\Lua\Ast\LastStatement;
+use Meh\Lua\Ast\LocalAssignment;
 use Meh\Lua\Ast\Name;
 use Meh\Lua\Ast\NameList;
 use Meh\Lua\Ast\Number;
@@ -25,6 +26,7 @@ use Meh\Lua\Ast\ParenthesizedExpressionList;
 use Meh\Lua\Ast\PrefixExpression;
 use Meh\Lua\Ast\ReturnStatement;
 use Meh\Lua\Ast\Statement;
+use Meh\Lua\Ast\StatementList;
 use Meh\Lua\Ast\String;
 use Meh\Lua\Ast\TableConstructor;
 use Meh\Lua\Ast\Variable;
@@ -103,7 +105,7 @@ class Builder
      */
     public function eq(Expression $left, Expression $right)
     {
-        return new BinaryExpression($left, new BinaryOperator('='), $right);
+        return new BinaryExpression($left, new BinaryOperator('=='), $right);
     }
 
     /**
@@ -151,6 +153,19 @@ class Builder
     public function ifStmt(Expression $expr, array $stmts, array $elseIfs = [], Block $else = null)
     {
         return new IfStatement($expr, $this->block($stmts), $elseIfs, $else);
+    }
+
+    /**
+     * @param NameList $names
+     * @param Expression|Expression[]|ExpressionList $expressions
+     * @return LocalAssignment
+     */
+    public function localAssign(NameList $names, $expressions = null)
+    {
+        return new LocalAssignment(
+            $names,
+            $expressions === null ? null : $this->exprList($expressions)
+        );
     }
 
     /**
@@ -202,6 +217,15 @@ class Builder
     }
 
     /**
+     * @param Statement[] $stmts
+     * @return StatementList
+     */
+    public function stmts(array $stmts)
+    {
+        return new StatementList($stmts);
+    }
+
+    /**
      * @param string $val
      * @return String
      */
@@ -237,6 +261,8 @@ class Builder
     {
         // Simple string is simple name
         if (is_string($pieces)) return new Name($pieces);
+        // If it's already a variable name, good
+        if ($pieces instanceof Variable) return $pieces;
         // Must be an array
         if (!is_array($pieces)) throw new MehException('Unexpected type of variable name');
         // Go through each, adding the last to the one before

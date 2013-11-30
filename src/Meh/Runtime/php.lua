@@ -3,6 +3,8 @@ local io = require "io"
 
 local php = {}
 
+php.globals = {}
+
 php.falseVal = { type = "bool", val = false }
 php.floatVal = function(val) return { type = "float", val = val } end
 php.intVal = function(val) return { type = "int", val = val } end
@@ -12,6 +14,7 @@ php.trueVal = { type = "bool", val = true }
 
 php.echo = io.write
 php.isset = function(...)
+  if ... == nil then return false end
   for _, v in ipairs(...) do
     if v == nil or v.val.type == "null" then return false end
   end

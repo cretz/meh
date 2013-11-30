@@ -18,6 +18,11 @@ class Context
         return $this;
     }
 
+    public function asString()
+    {
+        return implode("\n", $this->lines);
+    }
+
     public function currIndent()
     {
         return str_repeat($this->indent, $this->depth);

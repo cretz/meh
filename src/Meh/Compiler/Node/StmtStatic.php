@@ -35,19 +35,26 @@ trait StmtStatic
         $stmts = [];
         // Init the table holding all the static vars for the function
         $staticTable = $this->initStaticVarTable($ctx, $stmts);
-        // Statements for initialization of static vars
+        // Statements for initialization of static vars and assigning to locals
         $initStmts = [];
+        $localStmts = [];
         foreach ($node->vars as $var) {
             $initStmts[] = $ctx->bld->assign(
-                $ctx->bld->name([$staticTable, $node->vars[0]->name]),
-                $var->default === null ? $this->phpNull() : $this->transpile($var->default)
+                $ctx->bld->varName([$staticTable, $var->name]),
+                $var->default === null ? $this->phpNull() : $this->transpile($var->default, $ctx)
+            );
+            // We need it in the local variable list
+            $localStmts[] = $ctx->bld->assign(
+                $ctx->bld->varName($var->name),
+                $ctx->bld->varName([$staticTable, $var->name])
             );
         }
         // If first one is nil, then initialize them all
         $stmts[] = $ctx->bld->ifStmt(
-            $ctx->bld->eq($ctx->bld->name([$staticTable, $node->vars[0]->name]), $ctx->bld->nil()),
+            $ctx->bld->eq($ctx->bld->varName([$staticTable, $node->vars[0]->name]), $ctx->bld->nil()),
             $initStmts
         );
-        return $ctx->bld->block($stmts);
+        $stmts = array_merge($stmts, $localStmts);
+        return $ctx->bld->stmts($stmts);
     }
 }

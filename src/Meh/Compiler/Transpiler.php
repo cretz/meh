@@ -35,7 +35,18 @@ class Transpiler
 
     public function transpile(\PHPParser_Node $node, Context $ctx)
     {
-        $funcName = str_replace(['PHPParser_', '_'], '', get_class($node));
-        return $this->{$funcName}($node, $ctx);
+        $funcName = 'transpile' . str_replace(['PHPParser_Node_', '_'], '', get_class($node));
+        $result = $this->{$funcName}($node, $ctx);
+        $ctx->debug('Transpiled ' . get_class($node) . ' to ' . get_class($result));
+        return $result;
+    }
+
+    public function transpileAll(array $nodes, Context $ctx)
+    {
+        $ret = array();
+        foreach ($nodes as $node) {
+            $ret[] = $this->transpile($node, $ctx);
+        }
+        return $ret;
     }
 }

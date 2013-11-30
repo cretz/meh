@@ -14,9 +14,21 @@ class Context
     /** @var mixed[] Stack (but reversed, a "FILO" of sorts) */
     public $childContexts = [];
 
+    /** @var bool */
+    public $debugEnabled = false;
+
     public function __construct()
     {
         $this->bld = new Builder();
+    }
+
+    /** @param string $string */
+    public function debug($string)
+    {
+        // TODO: make this smarter w/ more params and format
+        if ($this->debugEnabled) {
+            echo("DEBUG: " . $string . "\n");
+        }
     }
 
     /** @return FunctionContext|null */

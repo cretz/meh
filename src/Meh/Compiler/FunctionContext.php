@@ -12,6 +12,9 @@ class FunctionContext
     /** @var bool */
     public $needsVarArg = false;
 
+    /** @var bool[] Keyed by variable name */
+    public $neededLocals = [];
+
     /** @param FunctionDeclaration $decl */
     public function __construct(FunctionDeclaration $decl)
     {
