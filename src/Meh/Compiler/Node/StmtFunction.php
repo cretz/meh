@@ -18,8 +18,11 @@ trait StmtFunction
         $decl = $ctx->bld->funcDeclHead($node->name, $params);
         $ctx->pushFunc($decl);
         $stmts = [];
-        // Put the local variable store at the top
-        $stmts[] = $ctx->bld->localAssign($ctx->bld->nameList(['locals']), $ctx->bld->table());
+        // Put the local context
+        $stmts[] = $ctx->bld->localAssign(
+            $ctx->bld->nameList(['ctx']),
+            $ctx->bld->call($ctx->bld->varName(['php', 'VarCtx', '__new']), [$ctx->bld->varName('ctx')])
+        );
         // Tranpile statements
         foreach ($node->stmts as $stmt) {
             $stmts[] = $this->transpile($stmt, $ctx);
@@ -27,10 +30,6 @@ trait StmtFunction
         // Now add var arg if necessary
         $funcCtx = $ctx->popFunc();
         if ($funcCtx->needsVarArg) $decl->body->parameters->variableArguments = new VariableArguments();
-        // And all locals
-        if (!empty($funcCtx->neededLocals)) {
-            array_unshift($stmts, $ctx->bld->localAssign($ctx->bld->nameList(array_keys($funcCtx->neededLocals))));
-        }
         $decl->body->block = $ctx->bld->block($stmts);
         return $decl;
     }

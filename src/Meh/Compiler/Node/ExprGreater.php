@@ -3,14 +3,14 @@ namespace Meh\Compiler\Node;
 
 use Meh\Compiler\Context;
 
-trait ExprConcat
+trait ExprGreater
 {
     abstract public function transpile(\PHPParser_Node $node, Context $ctx);
 
-    public function transpileExprConcat(\PHPParser_Node_Expr_Concat $node, Context $ctx)
+    public function transpileExprGreater(\PHPParser_Node_Expr_Greater $node, Context $ctx)
     {
         return $ctx->bld->call(
-            $ctx->bld->varName(['php', 'concat']),
+            $ctx->bld->varName(['php', 'gt']),
             [$this->transpile($node->left, $ctx), $this->transpile($node->right, $ctx)]
         );
     }

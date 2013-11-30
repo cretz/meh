@@ -40,6 +40,15 @@ class Context
         return null;
     }
 
+    /** @return VariableContext|null */
+    public function peekVarCtx()
+    {
+        foreach ($this->childContexts as $context) {
+            if ($context instanceof VariableContext) return $context;
+        }
+        return null;
+    }
+
     /**
      * @param bool $val
      * @return Variable
@@ -114,6 +123,15 @@ class Context
         return $this->childContexts[0];
     }
 
+    /** @return VariableContext */
+    public function popVarCtx()
+    {
+        if (empty($this->childContexts) || !($this->childContexts[0] instanceof VariableContext)) {
+            throw new MehException('Variable context not at top of stack');
+        }
+        return $this->childContexts[0];
+    }
+
     /**
      * @param FunctionDeclaration $decl
      * @return FunctionContext
@@ -121,6 +139,14 @@ class Context
     public function pushFunc(FunctionDeclaration $decl)
     {
         $ctx = new FunctionContext($decl);
+        array_unshift($this->childContexts, $ctx);
+        return $ctx;
+    }
+
+    /** @return VariableContext */
+    public function pushVarCtx()
+    {
+        $ctx = new VariableContext();
         array_unshift($this->childContexts, $ctx);
         return $ctx;
     }

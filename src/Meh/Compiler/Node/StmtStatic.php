@@ -45,7 +45,7 @@ trait StmtStatic
             );
             // We need it in the local variable list
             $localStmts[] = $ctx->bld->assign(
-                $ctx->bld->varName($var->name),
+                $ctx->bld->varName(['ctx', $var->name]),
                 $ctx->bld->varName([$staticTable, $var->name])
             );
         }

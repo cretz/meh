@@ -44,13 +44,10 @@ class PhpSrcTest extends MehTestCase
         $stmts = (new \PHPParser_Parser(new \PHPParser_Lexer()))->parse($test->file->contents);
         // Compile it
         $transpileCtx = new Context();
-        $nodes = (new Transpiler())->transpileAll($stmts, $transpileCtx);
+        $stmtList = (new Transpiler())->transpileFile($stmts, $transpileCtx);
         // To string
         $printCtx = new \Meh\Lua\Printer\Context();
-        $printer = new Printer();
-        foreach ($nodes as $node) {
-            $printer->printStatement($node, $printCtx);
-        }
+        (new Printer())->printStatementList($stmtList, $printCtx);
         // Find the php runtime
         $runtimePath = realpath(__DIR__ . '/../../../src/Meh/Runtime/');
         $this->assertNotSame(false, $runtimePath, 'Cannot find runtime folder');
@@ -65,7 +62,7 @@ class PhpSrcTest extends MehTestCase
         );
         $this->assertNotSame(false, $process);
         // Write the script
-        $script = "local php = require 'php'\n" . $printCtx->asString();
+        $script = $printCtx->asString();
         fwrite($pipes[0], $script);
         fclose($pipes[0]);
         // Get the contents

@@ -50,14 +50,10 @@ class Dev extends Script
         // Parse file part
         $stmts = (new \PHPParser_Parser(new \PHPParser_Lexer()))->parse($test->file->contents);
         // Transpile
-        $transpileCtx = new Context();
-        $nodes = (new Transpiler())->transpileAll($stmts, $transpileCtx);
+        $nodes = (new Transpiler())->transpileFile($stmts, new Context());
         // Print
         $printCtx = new \Meh\Lua\Printer\Context();
-        $printer = new Printer();
-        foreach ($nodes as $node) {
-            $printer->printStatement($node, $printCtx);
-        }
+        (new Printer())->printStatementList($nodes, $printCtx);
         echo("Lua output:\n" . $printCtx->asString() . "\n");
     }
 }

@@ -7,6 +7,6 @@ trait ScalarString
 {
     public function transpileScalarString(\PHPParser_Node_Scalar_String $node, Context $ctx)
     {
-        return $ctx->bld->string($node->value);
+        return $ctx->phpString($node->value);
     }
 }

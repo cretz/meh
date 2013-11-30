@@ -33,6 +33,7 @@ use Meh\Lua\Ast\Variable;
 use Meh\Lua\Ast\VariableArguments;
 use Meh\Lua\Ast\VariableList;
 use Meh\Lua\Ast\VariableName;
+use Meh\Lua\Ast\WhileStatement;
 use Meh\MehException;
 
 class Builder
@@ -272,5 +273,15 @@ class Builder
             else $var = new VariableName($var, $this->varName($piece));
         }
         return $var;
+    }
+
+    /**
+     * @param Expression $cond
+     * @param (Statement|LastStatement)[] $stmts
+     * @return WhileStatement
+     */
+    public function whileStmt(Expression $cond, array $stmts)
+    {
+        return new WhileStatement($cond, $this->block($stmts));
     }
 }
