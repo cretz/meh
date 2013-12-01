@@ -28,8 +28,8 @@ class PhpSrcTest extends MehTestCase
             $realPath = $fileInfo->getRealPath();
             if (substr_compare($realPath, '.phpt', -5) === 0) $files[] = [$realPath];
         }
-        return $files;
-        // return [$files[count($files) - 1]];
+//         return $files;
+        return [$files[count($files) - 1]];
     }
 
     /**
@@ -85,7 +85,7 @@ class PhpSrcTest extends MehTestCase
         $this->assertEquals(
             trim($test->expectation->contents),
             trim($contents),
-            "Comparison failed, input: \n" . $script
+            "Comparison failed, input: \n" . $script . "\nErr:\n" . $errorContents
         );
     }
 }

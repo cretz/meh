@@ -14,8 +14,10 @@ use Meh\Lua\Ast\FunctionBody;
 use Meh\Lua\Ast\FunctionCall;
 use Meh\Lua\Ast\FunctionDeclaration;
 use Meh\Lua\Ast\FunctionName;
+use Meh\Lua\Ast\GotoStatement;
 use Meh\Lua\Ast\IfStatement;
 use Meh\Lua\Ast\KeywordLiteral;
+use Meh\Lua\Ast\Label;
 use Meh\Lua\Ast\LastStatement;
 use Meh\Lua\Ast\LocalAssignment;
 use Meh\Lua\Ast\Name;
@@ -155,6 +157,15 @@ class Builder
     }
 
     /**
+     * @param string $label
+     * @return GotoStatement
+     */
+    public function gotoExpr($label)
+    {
+        return new GotoStatement(new Name($label));
+    }
+
+    /**
      * @param Expression $expr
      * @param (Statement|LastStatement)[] $stmts
      * @param ElseIfExpression[] $elseIfs
@@ -164,6 +175,15 @@ class Builder
     public function ifStmt(Expression $expr, array $stmts, array $elseIfs = [], Block $else = null)
     {
         return new IfStatement($expr, $this->block($stmts), $elseIfs, $else);
+    }
+
+    /**
+     * @param string $label
+     * @return Label
+     */
+    public function label($label)
+    {
+        return new Label(new Name($label));
     }
 
     /**
@@ -225,6 +245,15 @@ class Builder
     public function params(array $params, $varArg)
     {
         return new ParameterList($this->nameList($params), $varArg ? new VariableArguments() : null);
+    }
+
+    /**
+     * @param Expression $expr
+     * @return ReturnStatement
+     */
+    public function returnExpr(Expression $expr = null)
+    {
+        return new ReturnStatement($expr === null ? null : $this->exprList($expr));
     }
 
     /**

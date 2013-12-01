@@ -18,7 +18,7 @@ trait StmtIf
             $stmts[] = $this->transpile($stmt, $ctx);
         }
         return $ctx->bld->ifStmt(
-            $this->transpile($node->cond, $ctx),
+            $ctx->phpIsTrue($this->transpile($node->cond, $ctx)),
             $stmts,
             $elseIfs,
             $node->else === null ? null : $this->transpile($node->else, $ctx)

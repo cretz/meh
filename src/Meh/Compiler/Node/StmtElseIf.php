@@ -13,6 +13,9 @@ trait StmtElseIf
         foreach ($node->stmts as $stmt) {
             $stmts[] = $this->transpile($stmt, $ctx);
         }
-        return $ctx->bld->elseIfExpr($this->transpile($node->cond, $ctx), $ctx->bld->block($stmts));
+        return $ctx->bld->elseIfExpr(
+            $ctx->phpIsTrue($this->transpile($node->cond, $ctx)),
+            $ctx->bld->block($stmts)
+        );
     }
 }

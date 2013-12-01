@@ -15,6 +15,6 @@ class String extends Node implements Expression, ArgumentList
     public function unescape()
     {
         // TODO: this needs to be smarter
-        return addcslashes($this->value, "\f\n\r\t\v\\");
+        return addcslashes($this->value, "\f\n\r\t\v\"\\");
     }
 }

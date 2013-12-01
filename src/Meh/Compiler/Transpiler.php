@@ -8,21 +8,27 @@ use Meh\Compiler\Node\ExprConcat;
 use Meh\Compiler\Node\ExprEqual;
 use Meh\Compiler\Node\ExprFuncCall;
 use Meh\Compiler\Node\ExprGreater;
+use Meh\Compiler\Node\ExprGreaterOrEqual;
 use Meh\Compiler\Node\ExprIsset;
+use Meh\Compiler\Node\ExprPlus;
 use Meh\Compiler\Node\ExprPostDec;
 use Meh\Compiler\Node\ExprPostInc;
 use Meh\Compiler\Node\ExprSmaller;
+use Meh\Compiler\Node\ExprSmallerOrEqual;
 use Meh\Compiler\Node\ExprVariable;
 use Meh\Compiler\Node\Name;
 use Meh\Compiler\Node\ScalarEncapsed;
 use Meh\Compiler\Node\ScalarLNumber;
 use Meh\Compiler\Node\ScalarString;
+use Meh\Compiler\Node\StmtBreak;
 use Meh\Compiler\Node\StmtEcho;
 use Meh\Compiler\Node\StmtElse;
 use Meh\Compiler\Node\StmtElseIf;
+use Meh\Compiler\Node\StmtFor;
 use Meh\Compiler\Node\StmtFunction;
 use Meh\Compiler\Node\StmtGlobal;
 use Meh\Compiler\Node\StmtIf;
+use Meh\Compiler\Node\StmtReturn;
 use Meh\Compiler\Node\StmtStatic;
 use Meh\Compiler\Node\StmtSwitch;
 use Meh\Compiler\Node\StmtWhile;
@@ -36,22 +42,28 @@ class Transpiler
         ExprEqual,
         ExprFuncCall,
         ExprGreater,
+        ExprGreaterOrEqual,
         ExprIsset,
+        ExprPlus,
         ExprPostDec,
         ExprPostInc,
         ExprSmaller,
+        ExprSmallerOrEqual,
         ExprVariable,
         File,
         Name,
         ScalarEncapsed,
         ScalarLNumber,
         ScalarString,
+        StmtBreak,
         StmtEcho,
         StmtElse,
         StmtElseIf,
+        StmtFor,
         StmtFunction,
         StmtGlobal,
         StmtIf,
+        StmtReturn,
         StmtStatic,
         StmtSwitch,
         StmtWhile;

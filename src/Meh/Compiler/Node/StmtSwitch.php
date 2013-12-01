@@ -46,6 +46,7 @@ trait StmtSwitch
         $ifStmts = [];
         $elseIfExprs = [];
         $elseBlock = null;
+        $ctx->pushLoop();
         foreach ($node->cases as $case) {
             // No condition? It's just the else block
             $cond = null;
@@ -69,20 +70,27 @@ trait StmtSwitch
             // Now the block
             $stmts = [];
             foreach ($case->stmts as $stmt) {
-                // Skip breaks
-                if (!($stmt instanceof \PHPParser_Node_Stmt_Break)) $stmts[] = $this->transpile($stmt, $ctx);
+                // Skip breaks without number
+                if (!($stmt instanceof \PHPParser_Node_Stmt_Break) || $stmt->num !== null) {
+                    $stmts[] = $this->transpile($stmt, $ctx);
+                }
             }
             // First is the if, others are elseif/else
             if ($ifExpr === null) {
                 // An empty condition? That's a strange default-only switch, but so be it
                 if ($cond == null) $ifExpr = $ctx->bld->trueExpr();
-                else $ifExpr = $cond;
+                else $ifExpr = $ctx->phpIsTrue($cond);
                 $ifStmts = $stmts;
             } elseif ($cond !== null) {
-                $elseIfExprs[] = $ctx->bld->elseIfExpr($cond, $ctx->bld->block($stmts));
+                $elseIfExprs[] = $ctx->bld->elseIfExpr($ctx->phpIsTrue($cond), $ctx->bld->block($stmts));
             } else {
                 $elseBlock = $ctx->bld->block($stmts);
             }
+        }
+        // Pop loop
+        $loop = $ctx->popLoop();
+        if ($loop->breakLabel !== null || $loop->continueLabel !== null) {
+            throw new MehException('Special break/continue not supported');
         }
         // Return if statement with the tmp assign
         return $ctx->bld->stmts([

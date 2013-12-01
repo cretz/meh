@@ -10,9 +10,19 @@ trait StmtWhile
     public function transpileStmtWhile(\PHPParser_Node_Stmt_While $node, Context $ctx)
     {
         $stmts = [];
+        $ctx->pushLoop();
         foreach ($node->stmts as $stmt) {
             $stmts[] = $this->transpile($stmt, $ctx);
         }
-        return $ctx->bld->whileStmt($this->transpile($node->cond, $ctx), $stmts);
+        // Pop loop
+        $loop = $ctx->popLoop();
+        // TODO: Handle special breaks/continues
+        if ($loop->breakLabel !== null || $loop->continueLabel !== null) {
+            throw new MehException('Special break/continue not supported');
+        }
+        return $ctx->bld->whileStmt(
+            $ctx->phpIsTrue($this->transpile($node->cond, $ctx)),
+            $stmts
+        );
     }
 }

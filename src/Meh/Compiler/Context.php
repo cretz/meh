@@ -48,6 +48,16 @@ class Context
         return $this->childContexts[count($this->childContexts) - 1];
     }
 
+    /** @return LoopContext|null */
+    public function peekLoop($depth = 1)
+    {
+        $currDepth = 0;
+        foreach ($this->childContexts as $context) {
+            if ($context instanceof LoopContext && ++$currDepth == $depth) return $context;
+        }
+        return null;
+    }
+
     /** @return VariableContext|null */
     public function peekVarCtx()
     {
@@ -55,6 +65,16 @@ class Context
             if ($context instanceof VariableContext) return $context;
         }
         return null;
+    }
+
+    /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return FunctionCall
+     */
+    public function phpAdd(Expression $left, Expression $right)
+    {
+        return $this->bld->call($this->bld->varName(['php', 'add']), [$left, $right]);
     }
 
     /**
@@ -92,10 +112,7 @@ class Context
      */
     public function phpEq(Expression $left, Expression $right)
     {
-        return $this->bld->call(
-            $this->bld->varName(['php', 'eq']),
-            [$left, $right]
-        );
+        return $this->bld->call($this->bld->varName(['php', 'eq']), [$left, $right]);
     }
 
     /** @return Variable */
@@ -127,12 +144,34 @@ class Context
     }
 
     /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return FunctionCall
+     */
+    public function phpGte(Expression $left, Expression $right)
+    {
+        return $this->bld->call(
+            $this->bld->varName(['php', 'gte']),
+            [$left, $right]
+        );
+    }
+
+    /**
      * @param int $val
      * @return FunctionCall
      */
     public function phpInt($val)
     {
         return $this->bld->call($this->bld->varName(['php', 'intVal']), [$this->bld->number($val)]);
+    }
+
+    /**
+     * @param Expression $val
+     * @return FunctionCall
+     */
+    public function phpIsTrue(Expression $val)
+    {
+        return $this->bld->call($this->bld->varName(['php', 'isTrue']), [$val]);
     }
 
     /**
@@ -144,6 +183,19 @@ class Context
     {
         return $this->bld->call(
             $this->bld->varName(['php', 'lt']),
+            [$left, $right]
+        );
+    }
+
+    /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return FunctionCall
+     */
+    public function phpLte(Expression $left, Expression $right)
+    {
+        return $this->bld->call(
+            $this->bld->varName(['php', 'lte']),
             [$left, $right]
         );
     }
@@ -186,7 +238,16 @@ class Context
         if (empty($this->childContexts) || !($this->childContexts[0] instanceof FunctionContext)) {
             throw new MehException('Function context not at top of stack');
         }
-        return $this->childContexts[0];
+        return array_shift($this->childContexts);
+    }
+
+    /** @return LoopContext */
+    public function popLoop()
+    {
+        if (empty($this->childContexts) || !($this->childContexts[0] instanceof LoopContext)) {
+            throw new MehException('Loop context not at top of stack');
+        }
+        return array_shift($this->childContexts);
     }
 
     /** @return VariableContext */
@@ -195,7 +256,7 @@ class Context
         if (empty($this->childContexts) || !($this->childContexts[0] instanceof VariableContext)) {
             throw new MehException('Variable context not at top of stack');
         }
-        return $this->childContexts[0];
+        return array_shift($this->childContexts);
     }
 
     /**
@@ -205,6 +266,14 @@ class Context
     public function pushFunc(FunctionDeclaration $decl)
     {
         $ctx = new FunctionContext($decl);
+        array_unshift($this->childContexts, $ctx);
+        return $ctx;
+    }
+
+    /** @return LoopContext */
+    public function pushLoop()
+    {
+        $ctx = new LoopContext();
         array_unshift($this->childContexts, $ctx);
         return $ctx;
     }

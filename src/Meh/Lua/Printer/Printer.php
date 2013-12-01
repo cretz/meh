@@ -408,7 +408,7 @@ class Printer
     public function printString(String $ast, Context $ctx)
     {
         // TODO: properly stringify
-        $ctx->append("'" . $ast->unescape() . "'");
+        $ctx->append('"' . $ast->unescape() . '"');
     }
 
     public function printTableConstructor(TableConstructor $ast, Context $ctx)
