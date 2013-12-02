@@ -1,6 +1,7 @@
 <?php
 namespace Meh\Compiler;
 
+use Meh\Lua\Ast\AnonymousFunction;
 use Meh\Lua\Ast\ArgumentList;
 use Meh\Lua\Ast\Assignment;
 use Meh\Lua\Ast\BinaryExpression;
@@ -10,6 +11,8 @@ use Meh\Lua\Ast\Chunk;
 use Meh\Lua\Ast\ElseIfExpression;
 use Meh\Lua\Ast\Expression;
 use Meh\Lua\Ast\ExpressionList;
+use Meh\Lua\Ast\Field;
+use Meh\Lua\Ast\FieldList;
 use Meh\Lua\Ast\FunctionBody;
 use Meh\Lua\Ast\FunctionCall;
 use Meh\Lua\Ast\FunctionDeclaration;
@@ -21,11 +24,13 @@ use Meh\Lua\Ast\Label;
 use Meh\Lua\Ast\LastStatement;
 use Meh\Lua\Ast\LocalAssignment;
 use Meh\Lua\Ast\Name;
+use Meh\Lua\Ast\NamedField;
 use Meh\Lua\Ast\NameList;
 use Meh\Lua\Ast\Number;
 use Meh\Lua\Ast\ParameterList;
 use Meh\Lua\Ast\ParenthesizedExpressionList;
 use Meh\Lua\Ast\PrefixExpression;
+use Meh\Lua\Ast\RepeatStatement;
 use Meh\Lua\Ast\ReturnStatement;
 use Meh\Lua\Ast\Statement;
 use Meh\Lua\Ast\StatementList;
@@ -48,6 +53,19 @@ class Builder
     public function andExpr(Expression $left, Expression $right)
     {
         return new BinaryExpression($left, new BinaryOperator('and'), $right);
+    }
+
+    /**
+     * @param string[] $params
+     * @param bool $varArg
+     * @param (Statement|LastStatement)[] $stmts
+     * @return AnonymousFunction
+     */
+    public function anonFunc(array $params, $varArg, array $stmts)
+    {
+        return new AnonymousFunction(
+            new FunctionBody($this->params($params, $varArg), $this->block($stmts))
+        );
     }
 
     /**
@@ -122,6 +140,22 @@ class Builder
     }
 
     /**
+     * @param Expression[] $exprs If curr key is numeric, it's array, otherwise map
+     * @return FieldList
+     */
+    public function fieldList(array $exprs)
+    {
+        if (empty($exprs)) return new FieldList([]);
+        $fields = [];
+        $isMap = !is_numeric(key($exprs));
+        foreach ($exprs as $index => $expr) {
+            if ($isMap) $fields[] = new NamedField($expr, new Name($index));
+            else $fields[] = new NamedField($expr);
+        }
+        return new FieldList($fields);
+    }
+
+    /**
      * @param Expression|Expression[]|ExpressionList $expressions
      * @return ExpressionList
      */
@@ -130,30 +164,6 @@ class Builder
         if (is_array($expressions)) return new ExpressionList($expressions);
         if ($expressions instanceof Expression) return new ExpressionList([$expressions]);
         return $expressions;
-    }
-
-    /**
-     * No statements, no var arg setting. Caller expected to set later
-     *
-     * @param string|string[] $name
-     * @param string[] $params
-     * @return FunctionDeclaration
-     */
-    public function funcDeclHead($name, array $params)
-    {
-        $funcName = null;
-        if (is_string($name)) $funcName = new FunctionName([$this->varName($name)]);
-        elseif (is_array($name)) {
-            $names = [];
-            foreach ($name as $piece) {
-                $names[] = $this->varName($piece);
-            }
-            $funcName = new FunctionName($names);
-        }
-        return new FunctionDeclaration(
-            $funcName,
-            new FunctionBody($this->params($params, false), new Block([]))
-        );
     }
 
     /**
@@ -248,6 +258,16 @@ class Builder
     }
 
     /**
+     * @param (Statement|LastStatement)[] $stmts
+     * @param Expression $cond
+     * @return RepeatStatement
+     */
+    public function repeatStatement(array $stmts, Expression $cond)
+    {
+        return new RepeatStatement($this->block($stmts), $cond);
+    }
+
+    /**
      * @param Expression $expr
      * @return ReturnStatement
      */
@@ -274,11 +294,24 @@ class Builder
         return new String($val);
     }
 
-    /** @return TableConstructor */
-    public function table()
+    /**
+     * @param FieldList $fields
+     * @return TableConstructor
+     */
+    public function table(FieldList $fields = null)
     {
-        return new TableConstructor();
+        return new TableConstructor($fields);
     }
+
+    public function tableStrArr(array $vals)
+    {
+        $fields = [];
+        foreach ($vals as $val) {
+            $fields[] = new Name($val);
+        }
+        return new TableConstructor(new FieldList($fields));
+    }
+
     /** @return KeywordLiteral */
     public function trueExpr()
     {

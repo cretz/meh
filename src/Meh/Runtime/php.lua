@@ -1,8 +1,22 @@
+local bit = require("bit")
 local io = require("io")
+local util = require("util")
 
 local php = {}
 
-php.globals = {}
+-- Namespace support
+php.namespaces = { children = {} }
+php.globalNs = php.namespaces
+php.ns = function(...)
+  local currNs = php.namespaces
+  for _, v in ipairs({...}) do
+    if currNs.children[v] == nil then
+      currNs.children[v] = { children = {} }
+    end
+    currNs = currNs.children[v]
+  end
+  return currNs
+end
 
 php.boolVal = function(val) return { type = "bool", val = val } end
 php.floatVal = function(val) return { type = "float", val = val } end
@@ -19,6 +33,19 @@ php.assign = function(val, newVal)
   val.val = newVal.val
   return val
 end
+php.bitAnd = function(left, right)
+  if left.type == "int" and right.type == "int" then return php.intVal(bit.band(left.val, right.val)) end
+  error("Bad type, left: " .. left.type .. ", right: " .. right.type)
+end
+php.bitOr = function(left, right)
+  if left.type == "int" and right.type == "int" then return php.intVal(bit.bor(left.val, right.val)) end
+  error("Bad type, left: " .. left.type .. ", right: " .. right.type)
+end
+php.call = function(ns, name, args)
+  local n = php.ns(unpack(ns))
+  if n.functions == nil or n.functions[name.val] == nil then error("Unknown func: " .. name.val) end
+  return n.functions[name.val](unpack(args))
+end
 php.concat = function(...)
   local r = ''
   for _, v in ipairs({...}) do
@@ -26,10 +53,16 @@ php.concat = function(...)
   end
   return php.stringVal(r)
 end
-php.echo = function(...)
-  for _, v in ipairs({...}) do
-    if v.val ~= nil then io.write(v.val) end
+php.defineFuncs = function(ns, fnTbl)
+  local n = php.ns(unpack(ns))
+  if n.functions == nil then n.functions = fnTbl
+  else
+    for k, v in pairs(fnTbl) do n.functions[k] = v end
   end
+end
+php.div = function(left, right)
+  if left.type == "int" and right.type == "int" then return php.intVal(left.val / right.val) end
+  error("Bad type, left: " .. left.type .. ", right: " .. right.type)
 end
 php.eq = function(left, right)
   if (left.type == "int" or left.type == "float") and
@@ -75,6 +108,10 @@ php.lte = function(left, right)
   if v.val then return php.boolVal(true) end
   return php.lt(left, right)
 end
+php.mult = function(left, right)
+  if left.type == "int" and right.type == "int" then return php.intVal(left.val * right.val) end
+  error("Bad type, left: " .. left.type .. ", right: " .. right.type)
+end
 php.postDec = function(val)
   ret = php.intVal(val.val)
   val.val = val.val - 1
@@ -84,6 +121,15 @@ php.postInc = function(val)
   ret = php.intVal(val.val)
   val.val = val.val + 1
   return ret
+end
+php.staticNs = function(...)
+  local ns = php.ns(unpack(...))
+  if ns.statics == nil then ns.statics = {} end
+  return ns.statics
+end
+php.sub = function(left, right)
+  if left.type == "int" and right.type == "int" then return php.intVal(left.val - right.val) end
+  error("Bad type, left: " .. left.type .. ", right: " .. right.type)
 end
 
 -- Special variable context class
@@ -95,15 +141,21 @@ php.VarCtx = {
     return v
   end
 }
-function php.VarCtx.__new(parent)
+php.varCtx = function(parent)
   local self = setmetatable({}, php.VarCtx)
   if parent == nil then self.__parent = -1
   else self.__parent = parent end
   return self
 end
+php.nsVarCtx = function(...)
+  local ns = php.ns(unpack(...))
+  if ns.variables == nil then ns.variables = php.varCtx() end
+  return ns.variables
+end
 
 -- Extensions (hardcoded for now)
-local ext = require("ext-errorfunc")
-ext.apply(php)
+require("ext-errorfunc").apply(php)
+require("ext-strings").apply(php)
+require("ext-var").apply(php)
 
 return php

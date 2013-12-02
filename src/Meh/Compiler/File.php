@@ -25,7 +25,8 @@ trait File
         // Add main context
         $stmts[] = $ctx->bld->localAssign(
             $ctx->bld->nameList(['ctx']),
-            $ctx->bld->call($ctx->bld->varName(['php', 'VarCtx', '__new']), [])
+            // TODO: namespaces
+            $ctx->bld->call($ctx->bld->varName(['php', 'nsVarCtx']), [$ctx->bld->table()])
         );
         // Transpile all nodes
         foreach ($nodes as $node) {

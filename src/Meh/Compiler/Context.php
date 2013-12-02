@@ -1,14 +1,13 @@
 <?php
 namespace Meh\Compiler;
 
-use Meh\Lua\Ast\Expression;
-use Meh\Lua\Ast\FunctionCall;
 use Meh\Lua\Ast\FunctionDeclaration;
-use Meh\Lua\Ast\Variable;
 use Meh\MehException;
 
 class Context
 {
+    use PhpHelper;
+
     /** @var Builder */
     public $bld;
 
@@ -48,7 +47,10 @@ class Context
         return $this->childContexts[count($this->childContexts) - 1];
     }
 
-    /** @return LoopContext|null */
+    /**
+     * @param int $depth
+     * @return LoopContext|null
+     */
     public function peekLoop($depth = 1)
     {
         $currDepth = 0;
@@ -65,171 +67,6 @@ class Context
             if ($context instanceof VariableContext) return $context;
         }
         return null;
-    }
-
-    /**
-     * @param Expression $left
-     * @param Expression $right
-     * @return FunctionCall
-     */
-    public function phpAdd(Expression $left, Expression $right)
-    {
-        return $this->bld->call($this->bld->varName(['php', 'add']), [$left, $right]);
-    }
-
-    /**
-     * @param Expression $left
-     * @param Expression $right
-     * @return FunctionCall
-     */
-    public function phpAssign(Expression $left, Expression $right)
-    {
-        return $this->bld->call($this->bld->varName(['php', 'assign']), [$left, $right]);
-    }
-
-    /**
-     * @param bool $val
-     * @return Variable
-     */
-    public function phpBool($val)
-    {
-        return $val ? $this->phpTrue() : $this->phpFalse();
-    }
-
-    /**
-     * @param Expression[] $pieces
-     * @return FunctionCall
-     */
-    public function phpConcat(array $pieces)
-    {
-        return $this->bld->call($this->bld->varName(['php', 'concat']), $pieces);
-    }
-
-    /**
-     * @param Expression $left
-     * @param Expression $right
-     * @return FunctionCall
-     */
-    public function phpEq(Expression $left, Expression $right)
-    {
-        return $this->bld->call($this->bld->varName(['php', 'eq']), [$left, $right]);
-    }
-
-    /** @return Variable */
-    public function phpFalse()
-    {
-        return $this->bld->varName(['php', 'falseVal']);
-    }
-
-    /**
-     * @param float $val
-     * @return FunctionCall
-     */
-    public function phpFloat($val)
-    {
-        return $this->bld->call($this->bld->varName(['php', 'floatVal']), [$this->bld->number($val)]);
-    }
-
-    /**
-     * @param Expression $left
-     * @param Expression $right
-     * @return FunctionCall
-     */
-    public function phpGt(Expression $left, Expression $right)
-    {
-        return $this->bld->call(
-            $this->bld->varName(['php', 'gt']),
-            [$left, $right]
-        );
-    }
-
-    /**
-     * @param Expression $left
-     * @param Expression $right
-     * @return FunctionCall
-     */
-    public function phpGte(Expression $left, Expression $right)
-    {
-        return $this->bld->call(
-            $this->bld->varName(['php', 'gte']),
-            [$left, $right]
-        );
-    }
-
-    /**
-     * @param int $val
-     * @return FunctionCall
-     */
-    public function phpInt($val)
-    {
-        return $this->bld->call($this->bld->varName(['php', 'intVal']), [$this->bld->number($val)]);
-    }
-
-    /**
-     * @param Expression $val
-     * @return FunctionCall
-     */
-    public function phpIsTrue(Expression $val)
-    {
-        return $this->bld->call($this->bld->varName(['php', 'isTrue']), [$val]);
-    }
-
-    /**
-     * @param Expression $left
-     * @param Expression $right
-     * @return FunctionCall
-     */
-    public function phpLt(Expression $left, Expression $right)
-    {
-        return $this->bld->call(
-            $this->bld->varName(['php', 'lt']),
-            [$left, $right]
-        );
-    }
-
-    /**
-     * @param Expression $left
-     * @param Expression $right
-     * @return FunctionCall
-     */
-    public function phpLte(Expression $left, Expression $right)
-    {
-        return $this->bld->call(
-            $this->bld->varName(['php', 'lte']),
-            [$left, $right]
-        );
-    }
-
-    /** @return Variable */
-    public function phpNull()
-    {
-        return $this->bld->varName(['php', 'nullVal']);
-    }
-
-    /**
-     * @param string $val
-     * @return FunctionCall
-     */
-    public function phpString($val)
-    {
-        return $this->bld->call($this->bld->varName(['php', 'stringVal']), [$this->bld->string($val)]);
-    }
-
-    /** @return Variable */
-    public function phpTrue()
-    {
-        return $this->bld->varName(['php', 'trueVal']);
-    }
-
-    /**
-     * @param mixed $val
-     * @return Variable
-     */
-    public function phpVal($val)
-    {
-        if ($val === null) return $this->phpNull();
-        if (is_bool($val)) return $this->phpBool($val);
-        if (is_int($val)) return $this->phpInt($val);
     }
 
     /** @return FunctionContext */
@@ -260,12 +97,12 @@ class Context
     }
 
     /**
-     * @param FunctionDeclaration $decl
+     * @param string $name
      * @return FunctionContext
      */
-    public function pushFunc(FunctionDeclaration $decl)
+    public function pushFunc($name)
     {
-        $ctx = new FunctionContext($decl);
+        $ctx = new FunctionContext($name);
         array_unshift($this->childContexts, $ctx);
         return $ctx;
     }

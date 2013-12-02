@@ -13,6 +13,6 @@ trait ExprIsset
         foreach ($node->vars as $var) {
             $vars[] = $this->transpile($var, $ctx);
         }
-        return $ctx->bld->call($ctx->bld->varName(['php', 'isset']), $vars);
+        return $ctx->phpCall(['isset'], $vars);
     }
 }

@@ -15,6 +15,6 @@ trait StmtEcho
             $exprs[] = $this->transpile($expr, $ctx);
         }
         // Create echo call
-        return $ctx->bld->call($ctx->bld->varName(['php', 'echo']), $exprs);
+        return $ctx->phpCall(['echo'], $exprs);
     }
 }

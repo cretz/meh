@@ -23,4 +23,9 @@ class BracketedField extends Node implements Field
         $this->right = $right;
         $this->separator = $separator;
     }
+
+    public function getSeparator()
+    {
+        return $this->separator;
+    }
 }

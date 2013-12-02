@@ -6,8 +6,8 @@ use Meh\Lua\Ast\LastStatement;
 
 class FunctionContext extends VariableContext
 {
-    /** @var FunctionDeclaration */
-    public $decl;
+    /** @var string */
+    public $name;
 
     /** @var bool */
     public $needsVarArg = false;
@@ -15,9 +15,12 @@ class FunctionContext extends VariableContext
     /** @var bool */
     public $needsGlobalCtx = false;
 
-    /** @param FunctionDeclaration $decl */
-    public function __construct(FunctionDeclaration $decl)
+    /** @var bool */
+    public $needsStaticTbl = false;
+
+    /** @param string $name */
+    public function __construct($name)
     {
-        $this->decl = $decl;
+        $this->name = $name;
     }
 }

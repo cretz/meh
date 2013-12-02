@@ -23,4 +23,9 @@ class NamedField extends Node implements Field
         $this->name = $name;
         $this->separator = $separator;
     }
+
+    public function getSeparator()
+    {
+        return $this->separator;
+    }
 }

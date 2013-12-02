@@ -15,13 +15,13 @@ trait StmtFunction
             $params[] = $param->name;
         }
         // Push decl w/ no statements
-        $decl = $ctx->bld->funcDeclHead(['php', $node->name], $params);
-        $ctx->pushFunc($decl);
+//        $decl = $ctx->bld->funcDeclHead(['php', $node->name], $params);
+        $ctx->pushFunc($node->name);
         $stmts = [];
         // Put the local context
         $stmts[] = $ctx->bld->localAssign(
             $ctx->bld->nameList(['ctx']),
-            $ctx->bld->call($ctx->bld->varName(['php', 'VarCtx', '__new']), [])
+            $ctx->bld->call($ctx->bld->varName(['php', 'varCtx']), [])
         );
         // Setup params
         foreach ($node->params as $param) {
@@ -42,17 +42,30 @@ trait StmtFunction
         foreach ($node->stmts as $stmt) {
             $stmts[] = $this->transpile($stmt, $ctx);
         }
-        // Now add var arg if necessary
+        // Pop context
         $funcCtx = $ctx->popFunc();
-        if ($funcCtx->needsVarArg) $decl->body->parameters->variableArguments = new VariableArguments();
-        // And global context
+        // Add static table
+        if ($funcCtx->needsStaticTbl) {
+            array_unshift(
+                $stmts,
+                $ctx->bld->localAssign(
+                    $ctx->bld->nameList(['_staticTbl']),
+                    // TODO: namespace
+                    $ctx->phpStaticNs([])
+                )
+            );
+        }
+        // Add global context
         if ($funcCtx->needsGlobalCtx) {
             array_unshift(
                 $stmts,
                 $ctx->bld->localAssign($ctx->bld->nameList(['_globalCtx']), $ctx->bld->varName('ctx'))
             );
         }
-        $decl->body->block = $ctx->bld->block($stmts);
-        return $decl;
+        // Define func
+        return $ctx->phpDefineFuncs(
+            [],
+            [$node->name => $ctx->bld->anonFunc($params, $funcCtx->needsVarArg, $stmts)]
+        );
     }
 }

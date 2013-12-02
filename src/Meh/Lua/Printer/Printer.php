@@ -108,7 +108,6 @@ class Printer
         $ctx->append('] = ');
         $this->printExpression($ast->right, $ctx);
         if ($ast->separator !== null) $ctx->append($ast->separator);
-        $ctx->append(' ');
     }
 
     public function printBreakStatement(BreakStatement $ast, Context $ctx)
@@ -173,8 +172,13 @@ class Printer
 
     public function printFieldList(FieldList $ast, Context $ctx)
     {
-        foreach ($ast->fields as $field) {
+        foreach ($ast->fields as $index => $field) {
             $this->printField($field, $ctx);
+            // If we're not the last but have no separator, use a comma
+            if ($field->getSeparator() === null && $index !== count($ast->fields) - 1) {
+                $ctx->append(',');
+            }
+            $ctx->append(' ');
         }
     }
 
@@ -313,7 +317,6 @@ class Printer
         }
         $this->printExpression($ast->expression, $ctx);
         if ($ast->separator !== null) $ctx->append($ast->separator);
-        $ctx->append(' ');
     }
 
     public function printNameList(NameList $ast, Context $ctx)

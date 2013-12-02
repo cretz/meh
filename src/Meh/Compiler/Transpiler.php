@@ -3,13 +3,18 @@ namespace Meh\Compiler;
 
 use Meh\Compiler\Node\Arg;
 use Meh\Compiler\Node\ExprAssign;
+use Meh\Compiler\Node\ExprBitwiseAnd;
+use Meh\Compiler\Node\ExprBitwiseOr;
 use Meh\Compiler\Node\ExprBooleanOr;
 use Meh\Compiler\Node\ExprConcat;
+use Meh\Compiler\Node\ExprDiv;
 use Meh\Compiler\Node\ExprEqual;
 use Meh\Compiler\Node\ExprFuncCall;
 use Meh\Compiler\Node\ExprGreater;
 use Meh\Compiler\Node\ExprGreaterOrEqual;
 use Meh\Compiler\Node\ExprIsset;
+use Meh\Compiler\Node\ExprMinus;
+use Meh\Compiler\Node\ExprMul;
 use Meh\Compiler\Node\ExprPlus;
 use Meh\Compiler\Node\ExprPostDec;
 use Meh\Compiler\Node\ExprPostInc;
@@ -21,6 +26,7 @@ use Meh\Compiler\Node\ScalarEncapsed;
 use Meh\Compiler\Node\ScalarLNumber;
 use Meh\Compiler\Node\ScalarString;
 use Meh\Compiler\Node\StmtBreak;
+use Meh\Compiler\Node\StmtDo;
 use Meh\Compiler\Node\StmtEcho;
 use Meh\Compiler\Node\StmtElse;
 use Meh\Compiler\Node\StmtElseIf;
@@ -37,13 +43,18 @@ class Transpiler
 {
     use Arg,
         ExprAssign,
+        ExprBitwiseAnd,
+        ExprBitwiseOr,
         ExprBooleanOr,
         ExprConcat,
+        ExprDiv,
         ExprEqual,
         ExprFuncCall,
         ExprGreater,
         ExprGreaterOrEqual,
         ExprIsset,
+        ExprMinus,
+        ExprMul,
         ExprPlus,
         ExprPostDec,
         ExprPostInc,
@@ -56,6 +67,7 @@ class Transpiler
         ScalarLNumber,
         ScalarString,
         StmtBreak,
+        StmtDo,
         StmtEcho,
         StmtElse,
         StmtElseIf,

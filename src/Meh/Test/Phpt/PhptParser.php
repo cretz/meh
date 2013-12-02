@@ -11,7 +11,7 @@ class PhptParser
     public function parse($contents)
     {
         // Get all lines
-        $lines = array_map('trim', explode("\n", $contents));
+        $lines = array_map('rtrim', explode("\n", $contents));
         // Pieces to build up
         $name = null;
         $file = null;
