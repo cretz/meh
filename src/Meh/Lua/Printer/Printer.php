@@ -172,14 +172,20 @@ class Printer
 
     public function printFieldList(FieldList $ast, Context $ctx)
     {
+        // Two or more fields means multiline
+        $multiline = count($ast->fields) > 1;
+        if ($multiline) $ctx->indent();
         foreach ($ast->fields as $index => $field) {
+            if ($multiline) $ctx->newLine();
             $this->printField($field, $ctx);
             // If we're not the last but have no separator, use a comma
             if ($field->getSeparator() === null && $index !== count($ast->fields) - 1) {
                 $ctx->append(',');
             }
-            $ctx->append(' ');
+            // Non multiline deserves a space
+            if (!$multiline) $ctx->append(' ');
         }
+        if ($multiline) $ctx->dedent()->newLine();
     }
 
     public function printForStatement(ForStatement $ast, Context $ctx)

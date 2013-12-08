@@ -3,6 +3,11 @@ namespace Meh\Test\Phpt;
 
 class PhptParser
 {
+    /** @var string[] */
+    public static $KNOWN_DIRECTIVES = [
+        'TEST', 'FILE', 'EXPECT', 'EXPECTF'
+    ];
+
     /**
      * @param string $contents
      * @return PhptTest
@@ -87,8 +92,10 @@ class PhptParser
         $contents = '';
         do {
             // Check end or append
-            if (!isset($lines[$cursor])
-                || (strpos($lines[$cursor], '--') === 0 && substr_compare($lines[$cursor], '--', -2) === 0)
+            if (!isset($lines[$cursor])) break;
+            if (strpos($lines[$cursor], '--') === 0
+                && substr_compare($lines[$cursor], '--', -2) === 0
+                && in_array(substr($lines[$cursor], 2, -2), self::$KNOWN_DIRECTIVES)
             ) break;
             if (!empty($contents)) $contents .= "\n";
             $contents .= $lines[$cursor];

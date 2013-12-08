@@ -80,12 +80,46 @@ trait PhpHelper
     }
 
     /**
+     * @param Expression $var
+     * @param string $name
+     * @param Expression[] $arguments
+     * @return FunctionCall
+     */
+    public function phpCallMethod(Expression $var, $name, array $arguments)
+    {
+        return $this->bld->call(
+            $this->bld->varName(['php', 'callMethod']),
+            [
+                $var,
+                $this->phpString($name),
+                $this->bld->table($this->bld->fieldList($arguments))
+            ]
+        );
+    }
+
+    /**
      * @param Expression[] $pieces
      * @return FunctionCall
      */
     public function phpConcat(array $pieces)
     {
         return $this->bld->call($this->bld->varName(['php', 'concat']), $pieces);
+    }
+
+    /**
+     * @param string[] $ns
+     * @param Expression[] $classTable
+     * @return FunctionCall
+     */
+    public function phpDefineClass(array $ns, array $classTable)
+    {
+        return $this->bld->call(
+            $this->bld->varName(['php', 'defineClass']),
+            [
+                $this->bld->tableStrArr($ns),
+                $this->bld->table($this->bld->fieldList($classTable))
+            ]
+        );
     }
 
     /**
@@ -243,7 +277,7 @@ trait PhpHelper
     /** @return Variable */
     public function phpNull()
     {
-        return $this->bld->varName(['php', 'nullVal']);
+        return $this->bld->call($this->bld->varName(['php', 'nullVal']), []);
     }
 
     /**

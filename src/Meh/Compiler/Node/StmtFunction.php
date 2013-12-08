@@ -8,14 +8,20 @@ trait StmtFunction
 {
     abstract public function transpile(\PHPParser_Node $node, Context $ctx);
 
-    public function transpileStmtFunction(\PHPParser_Node_Stmt_Function $node, Context $ctx)
+    /**
+     * @param \PHPParser_Node_Stmt_Function|\PHPParser_Node_Stmt_ClassMethod $node
+     * @param Context $ctx
+     * @param bool $prependThisParam
+     * @return \Meh\Lua\Ast\AnonymousFunction
+     */
+    public function transpileFunction(\PHPParser_Node_Stmt $node, Context $ctx, $prependThisParam = false)
     {
         $params = [];
+        if ($prependThisParam) $params[] = 'this';
         foreach ($node->params as $param) {
             $params[] = $param->name;
         }
         // Push decl w/ no statements
-//        $decl = $ctx->bld->funcDeclHead(['php', $node->name], $params);
         $ctx->pushFunc($node->name);
         $stmts = [];
         // Put the local context
@@ -24,6 +30,9 @@ trait StmtFunction
             $ctx->bld->call($ctx->bld->varName(['php', 'varCtx']), [])
         );
         // Setup params
+        if ($prependThisParam) {
+            $stmts[] = $ctx->phpAssign($ctx->bld->varName(['ctx', 'this']), $ctx->bld->varName('this'));
+        }
         foreach ($node->params as $param) {
             // TODO: defaults and references
             if ($param->byRef) {
@@ -38,7 +47,7 @@ trait StmtFunction
                 );
             }
         }
-        // Tranpile statements
+        // Transpile statements
         foreach ($node->stmts as $stmt) {
             $stmts[] = $this->transpile($stmt, $ctx);
         }
@@ -63,9 +72,15 @@ trait StmtFunction
             );
         }
         // Define func
+        return $ctx->bld->anonFunc($params, $funcCtx->needsVarArg, $stmts);
+    }
+
+    public function transpileStmtFunction(\PHPParser_Node_Stmt_Function $node, Context $ctx)
+    {
+        // Define func
         return $ctx->phpDefineFuncs(
             [],
-            [$node->name => $ctx->bld->anonFunc($params, $funcCtx->needsVarArg, $stmts)]
+            [$node->name => $this->transpileFunction($node, $ctx)]
         );
     }
 }

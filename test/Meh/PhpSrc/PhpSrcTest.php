@@ -6,6 +6,7 @@ use Meh\Compiler\Transpiler;
 use Meh\Lua\Printer\Printer;
 use Meh\MehTestCase;
 use Meh\Test\Phpt\PhptParser;
+use Meh\Util\StringUtils;
 
 class PhpSrcTest extends MehTestCase
 {
@@ -28,8 +29,8 @@ class PhpSrcTest extends MehTestCase
             $realPath = $fileInfo->getRealPath();
             if (substr_compare($realPath, '.phpt', -5) === 0) $files[] = [$realPath];
         }
-        return $files;
-//        return [$files[6]];
+//        return $files;
+        return [$files[7]];
     }
 
     /**
@@ -72,12 +73,13 @@ class PhpSrcTest extends MehTestCase
         // And error contents
         $errorContents = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
+        $util = new StringUtils();
         // Close and check result
         $this->assertEquals(
             0,
             proc_close($process),
-            "Process failed, input: \n" . $script . "\nOutput:\n" .
-                $contents . "\nErr:\n" . $errorContents
+            "Process failed, input: \n" . $util->withLineNumbers($script) . "\nOutput:\n" .
+                $util->withLineNumbers($contents) . "\nErr:\n" . $util->withLineNumbers($errorContents)
         );
         // Compare output
         // Trim each line of contents
@@ -85,7 +87,8 @@ class PhpSrcTest extends MehTestCase
         $this->assertEquals(
             trim($test->expectation->contents),
             trim($contents),
-            "Comparison failed, input: \n" . $script . "\nErr:\n" . $errorContents
+            "Comparison failed, input: \n" . $util->withLineNumbers($script) . "\nErr:\n" .
+                $util->withLineNumbers($errorContents)
         );
     }
 }
