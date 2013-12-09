@@ -1,9 +1,6 @@
 <?php
 namespace Meh\Compiler;
 
-use Meh\Lua\Ast\FunctionDeclaration;
-use Meh\Lua\Ast\LastStatement;
-
 class FunctionContext extends VariableContext
 {
     /** @var string */

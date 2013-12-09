@@ -13,6 +13,7 @@ use Meh\Lua\Ast\Expression;
 use Meh\Lua\Ast\ExpressionList;
 use Meh\Lua\Ast\Field;
 use Meh\Lua\Ast\FieldList;
+use Meh\Lua\Ast\ForInStatement;
 use Meh\Lua\Ast\FunctionBody;
 use Meh\Lua\Ast\FunctionCall;
 use Meh\Lua\Ast\FunctionDeclaration;
@@ -156,6 +157,17 @@ class Builder
     }
 
     /**
+     * @param NameList $names
+     * @param Expression|Expression[]|ExpressionList $exprs
+     * @param (Statement|LastStatement)[] $stmts
+     * @return ForInStatement
+     */
+    public function forIn(NameList $names, $exprs, array $stmts)
+    {
+        return new ForInStatement($names, $this->exprList($exprs), $this->block($stmts));
+    }
+
+    /**
      * @param Expression|Expression[]|ExpressionList $expressions
      * @return ExpressionList
      */
@@ -220,6 +232,16 @@ class Builder
             $nameArr[] = $this->varName($name);
         }
         return new NameList($nameArr);
+    }
+
+    /**
+     * @param Expression $left
+     * @param Expression $right
+     * @return BinaryExpression
+     */
+    public function neq(Expression $left, Expression $right)
+    {
+        return new BinaryExpression($left, new BinaryOperator('~='), $right);
     }
 
     /** @return KeywordLiteral */

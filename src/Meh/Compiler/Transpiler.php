@@ -2,6 +2,8 @@
 namespace Meh\Compiler;
 
 use Meh\Compiler\Node\Arg;
+use Meh\Compiler\Node\ExprArray;
+use Meh\Compiler\Node\ExprArrayItem;
 use Meh\Compiler\Node\ExprAssign;
 use Meh\Compiler\Node\ExprBitwiseAnd;
 use Meh\Compiler\Node\ExprBitwiseOr;
@@ -24,6 +26,7 @@ use Meh\Compiler\Node\ExprPrint;
 use Meh\Compiler\Node\ExprPropertyFetch;
 use Meh\Compiler\Node\ExprSmaller;
 use Meh\Compiler\Node\ExprSmallerOrEqual;
+use Meh\Compiler\Node\ExprStaticCall;
 use Meh\Compiler\Node\ExprVariable;
 use Meh\Compiler\Node\Name;
 use Meh\Compiler\Node\ScalarEncapsed;
@@ -37,9 +40,11 @@ use Meh\Compiler\Node\StmtEcho;
 use Meh\Compiler\Node\StmtElse;
 use Meh\Compiler\Node\StmtElseIf;
 use Meh\Compiler\Node\StmtFor;
+use Meh\Compiler\Node\StmtForeach;
 use Meh\Compiler\Node\StmtFunction;
 use Meh\Compiler\Node\StmtGlobal;
 use Meh\Compiler\Node\StmtIf;
+use Meh\Compiler\Node\StmtInlineHTML;
 use Meh\Compiler\Node\StmtProperty;
 use Meh\Compiler\Node\StmtReturn;
 use Meh\Compiler\Node\StmtStatic;
@@ -49,6 +54,8 @@ use Meh\Compiler\Node\StmtWhile;
 class Transpiler
 {
     use Arg,
+        ExprArray,
+        ExprArrayItem,
         ExprAssign,
         ExprBitwiseAnd,
         ExprBitwiseOr,
@@ -71,6 +78,7 @@ class Transpiler
         ExprPropertyFetch,
         ExprSmaller,
         ExprSmallerOrEqual,
+        ExprStaticCall,
         ExprVariable,
         File,
         Name,
@@ -85,9 +93,11 @@ class Transpiler
         StmtElse,
         StmtElseIf,
         StmtFor,
+        StmtForeach,
         StmtFunction,
         StmtGlobal,
         StmtIf,
+        StmtInlineHTML,
         StmtProperty,
         StmtReturn,
         StmtStatic,

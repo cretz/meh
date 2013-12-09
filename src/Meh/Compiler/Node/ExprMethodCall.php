@@ -16,6 +16,12 @@ trait ExprMethodCall
         }
         // TODO: var func names
         if (!is_string($node->name)) throw new MehException('Must be literal name');
-        return $ctx->phpCallMethod($this->transpile($node->var, $ctx), $node->name, $args);
+        $currClass = $ctx->peekClass();
+        return $ctx->phpCallMethod(
+            $currClass === null ? null : $currClass->getName(),
+            $this->transpile($node->var, $ctx),
+            $node->name,
+            $args
+        );
     }
 }

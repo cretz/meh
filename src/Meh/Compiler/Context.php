@@ -31,6 +31,15 @@ class Context
         }
     }
 
+    /** @return ClassContext|null */
+    public function peekClass()
+    {
+        foreach ($this->childContexts as $context) {
+            if ($context instanceof ClassContext) return $context;
+        }
+        return null;
+    }
+
     /** @return FunctionContext|null */
     public function peekFunc()
     {
@@ -69,6 +78,15 @@ class Context
         return null;
     }
 
+    /** @return ClassContext */
+    public function popClass()
+    {
+        if (empty($this->childContexts) || !($this->childContexts[0] instanceof ClassContext)) {
+            throw new MehException('Class context not at top of stack');
+        }
+        return array_shift($this->childContexts);
+    }
+
     /** @return FunctionContext */
     public function popFunc()
     {
@@ -94,6 +112,17 @@ class Context
             throw new MehException('Variable context not at top of stack');
         }
         return array_shift($this->childContexts);
+    }
+
+    /**
+     * @param \PHPParser_Node_Stmt_Class $node
+     * @return ClassContext
+     */
+    public function pushClass(\PHPParser_Node_Stmt_Class $node)
+    {
+        $ctx = new ClassContext($node);
+        array_unshift($this->childContexts, $ctx);
+        return $ctx;
     }
 
     /**

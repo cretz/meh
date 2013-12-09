@@ -2,6 +2,7 @@
 namespace Meh\Compiler;
 
 use Meh\Lua\Ast\Expression;
+use Meh\Lua\Ast\FieldList;
 use Meh\Lua\Ast\FunctionCall;
 use Meh\Lua\Ast\Name;
 use Meh\Lua\Ast\NamedField;
@@ -20,6 +21,20 @@ trait PhpHelper
     public function phpAdd(Expression $left, Expression $right)
     {
         return $this->bld->call($this->bld->varName(['php', 'add']), [$left, $right]);
+    }
+
+    /**
+     * Expects { key = ?, val = ? }
+     *
+     * @param FieldList $fields
+     * @return FunctionCall
+     */
+    public function phpArray(FieldList $fields)
+    {
+        return $this->bld->call(
+            $this->bld->varName(['php', 'arrayVal']),
+            [$this->bld->table($fields)]
+        );
     }
 
     /**
@@ -80,16 +95,18 @@ trait PhpHelper
     }
 
     /**
+     * @param string|null $inClass
      * @param Expression $var
      * @param string $name
      * @param Expression[] $arguments
      * @return FunctionCall
      */
-    public function phpCallMethod(Expression $var, $name, array $arguments)
+    public function phpCallMethod($inClass, Expression $var, $name, array $arguments)
     {
         return $this->bld->call(
             $this->bld->varName(['php', 'callMethod']),
             [
+                $inClass === null ? $this->bld->nil() : $this->bld->string($inClass),
                 $var,
                 $this->phpString($name),
                 $this->bld->table($this->bld->fieldList($arguments))

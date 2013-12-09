@@ -20,6 +20,8 @@ trait StmtClass
         if ($node->extends !== null) {
             $fields['parent'] = $ctx->bld->string($node->extends->parts[0]);
         }
+        // Push class
+        $ctx->pushClass($node);
         // Now methods and properties
         $methods = [];
         foreach ($node->stmts as $stmt) {
@@ -40,6 +42,8 @@ trait StmtClass
             } else throw new MehException('Unknown type: ' . get_class($node));
         }
         if (!empty($methods)) $fields['methods'] = $ctx->bld->table($ctx->bld->fieldList($methods));
+        // Pop class
+        $ctx->popClass();
         return $ctx->phpDefineClass([], $fields);
     }
 }

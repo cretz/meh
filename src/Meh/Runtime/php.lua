@@ -18,6 +18,8 @@ php.ns = function(...)
   return currNs
 end
 
+-- Expects array of { key = ?, val = ? } w/ possible nil key
+php.arrayVal = function(...) return php.call({ }, php.stringVal('array'), ...) end
 php.boolVal = function(val) return { type = "bool", val = val } end
 php.floatVal = function(val) return { type = "float", val = val } end
 php.intVal = function(val) return { type = "int", val = val } end
@@ -48,12 +50,15 @@ php.call = function(ns, name, args)
   if n.functions == nil or n.functions[name.val] == nil then error("Unknown func: " .. name.val) end
   return n.functions[name.val](unpack(args))
 end
-php.callMethod = function(var, name, args)
+php.callMethod = function(inCls, var, name, args)
   if var.val == nil then error('Nil var') end
-  -- Find the method up the stack
+  -- Find the method up the stack after the inCls is found
+  -- TODO: support ns inCls
   local v = var.val
+  local inClsFound = inCls == nil
   while v ~= nil do
-    if v.methods ~= nil and v.methods[name.val] ~= nil then
+    if not inClsFound and v.meta.name == inCls then inClsFound = true end
+    if inClsFound and v.methods ~= nil and v.methods[name.val] ~= nil then
       return v.methods[name.val](var, unpack(args))
     end
     v = v.parent
@@ -95,12 +100,16 @@ php.eq = function(left, right)
   elseif left.type == "string" and right.type == "string" then return php.boolVal(left.val == right.val) end
   error("Bad type, left: " .. left.type .. ", right: " .. right.type)
 end
-php.fetchProperty = function(var, name)
+php.fetchProperty = function(inCls, var, name)
   if var.val == nil then error('Nil var') end
-  -- Find the property up the stack
+  -- Find the property up the stack after inCls found
   local v = var.val
+  local inClsFound = inCls == nil
   while v ~= nil do
-    if v.properties ~= nil and v.properties[name.val] ~= nil then return v.properties[name.val] end
+    if not inClsFound and v.meta.name == inCls then inClsFound = true end
+    if inClsFound and v.properties ~= nil and v.properties[name.val] ~= nil then
+      return v.properties[name.val]
+    end
     v = v.parent
   end
   error("No property: " .. name.val)
@@ -227,6 +236,7 @@ php.nsVarCtx = function(...)
 end
 
 -- Extensions (hardcoded for now)
+require("ext-array").apply(php)
 require("ext-errorfunc").apply(php)
 require("ext-strings").apply(php)
 require("ext-var").apply(php)
