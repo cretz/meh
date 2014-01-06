@@ -9,6 +9,7 @@ use Meh\Compiler\Node\ExprBitwiseAnd;
 use Meh\Compiler\Node\ExprBitwiseOr;
 use Meh\Compiler\Node\ExprBooleanOr;
 use Meh\Compiler\Node\ExprConcat;
+use Meh\Compiler\Node\ExprConstFetch;
 use Meh\Compiler\Node\ExprDiv;
 use Meh\Compiler\Node\ExprEqual;
 use Meh\Compiler\Node\ExprFuncCall;
@@ -24,6 +25,7 @@ use Meh\Compiler\Node\ExprPostDec;
 use Meh\Compiler\Node\ExprPostInc;
 use Meh\Compiler\Node\ExprPrint;
 use Meh\Compiler\Node\ExprPropertyFetch;
+use Meh\Compiler\Node\ExprShiftLeft;
 use Meh\Compiler\Node\ExprSmaller;
 use Meh\Compiler\Node\ExprSmallerOrEqual;
 use Meh\Compiler\Node\ExprStaticCall;
@@ -49,6 +51,8 @@ use Meh\Compiler\Node\StmtProperty;
 use Meh\Compiler\Node\StmtReturn;
 use Meh\Compiler\Node\StmtStatic;
 use Meh\Compiler\Node\StmtSwitch;
+use Meh\Compiler\Node\StmtTrait;
+use Meh\Compiler\Node\StmtTraitUse;
 use Meh\Compiler\Node\StmtWhile;
 
 class Transpiler
@@ -61,6 +65,7 @@ class Transpiler
         ExprBitwiseOr,
         ExprBooleanOr,
         ExprConcat,
+        ExprConstFetch,
         ExprDiv,
         ExprEqual,
         ExprFuncCall,
@@ -76,6 +81,7 @@ class Transpiler
         ExprPostInc,
         ExprPrint,
         ExprPropertyFetch,
+        ExprShiftLeft,
         ExprSmaller,
         ExprSmallerOrEqual,
         ExprStaticCall,
@@ -102,6 +108,8 @@ class Transpiler
         StmtReturn,
         StmtStatic,
         StmtSwitch,
+        StmtTrait,
+        StmtTraitUse,
         StmtWhile;
 
     public function transpile(\PHPParser_Node $node, Context $ctx)

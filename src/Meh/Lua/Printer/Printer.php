@@ -29,6 +29,7 @@ use Meh\Lua\Ast\KeywordLiteral;
 use Meh\Lua\Ast\Label;
 use Meh\Lua\Ast\LocalAssignment;
 use Meh\Lua\Ast\LocalFunctionDeclaration;
+use Meh\Lua\Ast\LuaCode;
 use Meh\Lua\Ast\Name;
 use Meh\Lua\Ast\NamedField;
 use Meh\Lua\Ast\NameList;
@@ -152,6 +153,7 @@ class Printer
         elseif ($ast instanceof TableConstructor) $this->printTableConstructor($ast, $ctx);
         elseif ($ast instanceof BinaryExpression) $this->printBinaryExpression($ast, $ctx);
         elseif ($ast instanceof UnaryExpression) $this->printUnaryExpression($ast, $ctx);
+        elseif ($ast instanceof LuaCode) $this->printLuaCode($ast, $ctx);
         else throw new MehException('Unrecognized expression: ' . get_class($ast));
     }
 
@@ -308,6 +310,11 @@ class Printer
         $this->printName($ast->name, $ctx);
         $ctx->append(' ');
         $this->printFunctionBody($ast->body, $ctx);
+    }
+
+    public function printLuaCode(LuaCode $ast, Context $ctx)
+    {
+        $ctx->append($ast->value);
     }
 
     public function printName(Name $ast, Context $ctx)

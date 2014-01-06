@@ -24,6 +24,7 @@ use Meh\Lua\Ast\KeywordLiteral;
 use Meh\Lua\Ast\Label;
 use Meh\Lua\Ast\LastStatement;
 use Meh\Lua\Ast\LocalAssignment;
+use Meh\Lua\Ast\LuaCode;
 use Meh\Lua\Ast\Name;
 use Meh\Lua\Ast\NamedField;
 use Meh\Lua\Ast\NameList;
@@ -219,6 +220,15 @@ class Builder
             $names,
             $expressions === null ? null : $this->exprList($expressions)
         );
+    }
+
+    /**
+     * @param string $code
+     * @return LuaCode
+     */
+    public function luaCode($code)
+    {
+        return new LuaCode($code);
     }
 
     /**

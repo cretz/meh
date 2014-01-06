@@ -18,12 +18,10 @@ trait StmtClassMethod
 
     public function transpileStmtClassMethod(\PHPParser_Node_Stmt_ClassMethod $node, Context $ctx)
     {
-        $func = $this->transpileFunction($node, $ctx, true);
         // Fields
-        $fields = [
-            'modifiers' => $ctx->bld->number($node->type),
-            '__invoke' => $func
-        ];
+        $fields = ['modifiers' => $ctx->bld->number($node->type)];
+        // Abstract means no func
+        if (!$node->isAbstract()) $fields['__invoke'] = $this->transpileFunction($node, $ctx, true);
         return $ctx->bld->call(
             $ctx->bld->varName(['php', 'defineMethod']),
             [$ctx->bld->table($ctx->bld->fieldList($fields))]

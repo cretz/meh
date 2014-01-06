@@ -21,12 +21,13 @@ class PhpSrcTest extends MehTestCase
     public function phptFileProvider()
     {
         $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(__DIR__ . '/php-src'),
+            new \RecursiveDirectoryIterator(__DIR__),
             \RecursiveIteratorIterator::LEAVES_ONLY
         );
         $files = [];
         foreach ($iterator as $fileInfo) {
             $realPath = $fileInfo->getRealPath();
+            // if (strpos($realPath, 'language001.phpt') === false) continue;
             if (substr_compare($realPath, '.phpt', -5) === 0) $files[] = [$realPath];
         }
         return $files;

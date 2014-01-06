@@ -156,6 +156,22 @@ trait PhpHelper
     }
 
     /**
+     * @param string[] $ns
+     * @param Expression[] $classTable
+     * @return FunctionCall
+     */
+    public function phpDefineTrait(array $ns, array $classTable)
+    {
+        return $this->bld->call(
+            $this->bld->varName(['php', 'defineTrait']),
+            [
+                $this->bld->tableStrArr($ns),
+                $this->bld->table($this->bld->fieldList($classTable))
+            ]
+        );
+    }
+
+    /**
      * @param Expression $left
      * @param Expression $right
      * @return FunctionCall

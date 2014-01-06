@@ -57,10 +57,16 @@ php.callMethod = function(inCls, var, name, args)
   local v = var.val
   local inClsFound = inCls == nil
   while v ~= nil do
+    -- io.write('Stuff for ' .. v.meta.name .. ': ' .. util.dump(v) .. '\n')
     if not inClsFound and v.meta.name == inCls then inClsFound = true end
     if inClsFound and v.methods ~= nil and v.methods[name.val] ~= nil then
       return v.methods[name.val](var, unpack(args))
     end
+    -- If it's abstract, error
+    -- TODO: trigger error properly
+    -- if inClsFound and v.meta.methods ~= nil and bit.band(v.meta.methods[name.val].modifiers, 16) ~= 0 then
+    --  error("Fatal error: cannot call abstract")
+    -- end
     v = v.parent
   end
   error("No method: " .. name.val)
@@ -73,9 +79,15 @@ php.concat = function(...)
   return php.stringVal(r)
 end
 php.defineClass = function(ns, clsTbl)
+  php.injectTraitsFromClassTable(ns, clsTbl)
   local n = php.ns(unpack(ns))
   if n.classes == nil then n.classes = { } end
   n.classes[clsTbl.name] = clsTbl
+end
+php.defineConst = function(ns, name, val)
+  local n = php.ns(unpack(ns))
+  if n.consts == nil then n.consts = {} end
+  n.consts[name] = val
 end
 php.defineFuncs = function(ns, fnTbl)
   local n = php.ns(unpack(ns))
@@ -90,6 +102,12 @@ end
 php.defineProperty = function(propTbl)
   return propTbl
 end
+php.defineTrait = function(ns, clsTbl)
+  php.injectTraitsFromClassTable(ns, clsTbl)
+  local n = php.ns(unpack(ns))
+  if n.traits == nil then n.traits = { } end
+  n.traits[clsTbl.name] = clsTbl
+end
 php.div = function(left, right)
   if left.type == "int" and right.type == "int" then return php.intVal(left.val / right.val) end
   error("Bad type, left: " .. left.type .. ", right: " .. right.type)
@@ -99,6 +117,11 @@ php.eq = function(left, right)
           (right.type == "int" or right.type == "float") then return php.boolVal(left.val == right.val)
   elseif left.type == "string" and right.type == "string" then return php.boolVal(left.val == right.val) end
   error("Bad type, left: " .. left.type .. ", right: " .. right.type)
+end
+php.fetchConst = function(ns, name)
+  local n = php.ns(unpack(ns))
+  if n.consts == nil or n.consts[name] == nil then error("Unknown const: " .. name) end
+  return n.consts[name]
 end
 php.fetchProperty = function(inCls, var, name)
   if var.val == nil then error('Nil var') end
@@ -123,6 +146,30 @@ php.gte = function(left, right)
   local v = php.eq(left, right)
   if v.val then return php.boolVal(true) end
   return php.gt(left, right)
+end
+php.injectTraitsFromClassTable = function(ns, clsTbl)
+  if clsTbl.traits ~= nil then
+    for k, v in pairs(clsTbl.traits) do
+      -- Find the trait (TODO: namespaces)
+      local n = php.ns(unpack(ns))
+      if n.traits == nil or n.traits[k] == nil then
+        error('No trait for ' .. clsName)
+      end
+      local t = n.traits[k]
+      -- Inject in the trait
+      php.injectTraitsFromClassTable(ns, t)
+      -- Copy over all members
+      if t.methods ~= nil then
+        if clsTbl.methods == nil then clsTbl.methods = { } end
+        for k, v in pairs(t.methods) do clsTbl.methods[k] = v end
+      end
+      if t.properties ~= nil then
+        if clsTbl.properties == nil then clsTbl.properties = { } end
+        for k, v in pairs(t.properties) do clsTbl.properties[k] = v end
+      end
+      -- TODO: lots more work here
+    end
+  end
 end
 php.isFalse = function(val)
   if val.type == "bool" then return val.val == false
